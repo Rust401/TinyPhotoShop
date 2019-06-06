@@ -30,17 +30,14 @@ public:
 
     Point& operator+(const Point& otherPoint){
         uint8_t alpha1=alpha;
-        uint8_t alpha2=otherPoint.getAlpha();
-        
+        uint8_t alpha2=otherPoint.getAlpha();       
         //map the alpha from 0-255 to 0.0-1.0
         double alphaFront=alpha/256.0;
-
         //get update the new color and the alpha
         red=(int8_t)(red*(1-alphaFront)+otherPoint.getRed()*alphaFront);
         blue=(int8_t)(blue*(1-alphaFront)+otherPoint.getBlue()*alphaFront);
         green=(int8_t)(green*(1-alphaFront)+otherPoint.getGreen()*alphaFront);
         alpha=(int8_t)(alpha+otherPoint.getAlpha()*(1-alphaFront));
-
         //return the first point
         return *this;
     }
