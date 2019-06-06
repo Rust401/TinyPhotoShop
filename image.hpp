@@ -11,15 +11,15 @@ private:
     uint8_t red,blue,green,alpha;
     uint8_t layerNumber;
 public:
-    Point(){};
-    /*Point(uint8_t red=0,uint8_t blue=0,uint8_t green=0,uint8_t alpha=0,uint8_t layerNumber=0):
-        red(red),blue(blue),green(green),alpha(alpha){}*/
+    Point(){}
+    Point(uint8_t red,uint8_t blue,uint8_t green,uint8_t alpha=0,uint8_t layerNumber=0):
+        red(red),blue(blue),green(green),alpha(alpha),layerNumber(layerNumber){}
     void init(){memset(this,0,5);}
     uint8_t getRed() const{return this->red;}
     uint8_t getBlue() const{return this->blue;}
     uint8_t getGreen() const{return this->green;}
     uint8_t getAlpha() const{return this->alpha;}
-    uint8_t getLayerNumbe() const{return this->alpha;}
+    uint8_t getLayerNumbe() const{return this->layerNumber;}
 
 
     void setRed(uint8_t value){this->red=value;}

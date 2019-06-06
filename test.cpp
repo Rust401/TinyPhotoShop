@@ -1,13 +1,15 @@
 #include "image.hpp"
 
 using namespace dude;
- 
+
 int main()
 {
-    Point a,b,c;
-    std::cout<<sizeof(a)<<std::endl;
-    a.init();
-    std::cout<<a.getRed()<<" "<<a.getBlue()<<" "<<a.getGreen()<<std::endl;
-    std::cout<<a.getAlpha()<<" "<<a.getLayerNumbe()<<std::endl;
+    dude::Point p1;
+    dude::Point px(20,20,20,20,0);
+    std::cout<<(int)p1.getLayerNumbe()<<std::endl;
+    dude::Point p2(10,10,10,20,0);
+    p1=(p1+p2);
+    std::vector<int> dudes={p1.getRed(),p1.getBlue(),p1.getGreen(),p1.getAlpha(),p1.getLayerNumbe()};
+    for(auto dude:dudes)std::cout<<dude<<std::endl;
     return 0;
 }
