@@ -13,4 +13,4 @@ image:
 	./image
 
 clean:
-	rm -f point
+	rm -f point layer

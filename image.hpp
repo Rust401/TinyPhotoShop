@@ -1,7 +1,10 @@
 #ifndef IMAGE_HPP
 #define IMAGE_HPP
 
+
 #include<bits/stdc++.h>
+
+#define pointMatrix std::vector<std::vector<Point>>
 
 namespace dude
 {
@@ -53,9 +56,18 @@ private:
     std::string name;
 public:
     std::vector<std::vector<Point>> matrix;
-    Layer();
+    Layer(){}
     Layer(uint8_t layerNumber,uint16_t length,uint16_t width,std::string name,std::vector<std::vector<Point>>& matrix,bool isValid=true):
         layerNumber(layerNumber),length(length),width(width),name(name),matrix(matrix){}
+
+    void init(){
+        layerNumber=0;
+        length=1024;
+        width=1024;
+        isValid=true;
+        name="";
+        matrix=*(new pointMatrix(width,std::vector<Point>(length,Point(0,0,0,0,0))));
+    }
     
     void setLayerNumber(uint8_t val){layerNumber=val;}
 
