@@ -1,7 +1,7 @@
 #include "image.hpp"
 
 using namespace dude;
-
+//This is the test for point
 int main()
 {
     dude::Point p1;
