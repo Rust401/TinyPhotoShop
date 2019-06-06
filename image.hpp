@@ -66,7 +66,7 @@ public:
         width=1024;
         isValid=true;
         name="";
-        matrix=*(new pointMatrix(width,std::vector<Point>(length,Point(0,0,0,0,0))));
+        matrix=*(new pointMatrix(1024,std::vector<Point>(1024,Point(20,20,30,240,1))));
     }
     
     void setLayerNumber(uint8_t val){layerNumber=val;}

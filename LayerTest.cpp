@@ -2,28 +2,17 @@
 
 using namespace dude;
 
-struct shabi
-{
-    bool shabime;
-};
 
 int main()
 {
-    Layer l1,l2;
-    std::cout<<sizeof(l1)<<std::endl;
-    std::string* p=new std::string;
-    std::string dude="nishishabi";
-    bool tf=true;
-    std::vector<int> v1;
-    std::vector<double> v2;
-    std::vector<Layer> v3;
-    shabi baichi;
-    
-    
-
-    std::cout<<sizeof(p)<<"  "<<sizeof(dude)<<" "<<sizeof(tf)<<std::endl;
-
-    std::cout<<sizeof(v1)<<" "<<sizeof(v2)<<" "<<sizeof(v3)<<std::endl;
+    Layer l1;
+    l1.init();
+    std::cout<<l1.matrix.size()<<std::endl;
+    std::cout<<l1.matrix[0].size()<<std::endl;
+    Point p=l1.matrix[0][0];
+    printf("%d %d %d\n",p.getRed(),p.getAlpha(),p.getLayerNumbe());
+    for(int i=0;i<1024;++i)
+        for(int j=0;j<1024;++j)
+            printf("%d %d %d\n",p.getRed(),p.getAlpha(),p.getLayerNumbe());
     return 0;
-
 }
