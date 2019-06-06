@@ -8,26 +8,42 @@ namespace dude
 class Point
 {
 private:
-    int8_t red,blue,green,alpha;
-    int8_t layerNumber;
+    uint8_t red,blue,green,alpha;
+    uint8_t layerNumber;
 public:
-    Point();
-    Point(int8_t red=0,int8_t blue=0,int8_t green=0,int8_t alpha=0,int8_t layerNumber=0):
-        red(red),blue(blue),green(green),alpha(alpha){}
-    
+    Point(){};
+    /*Point(uint8_t red=0,uint8_t blue=0,uint8_t green=0,uint8_t alpha=0,uint8_t layerNumber=0):
+        red(red),blue(blue),green(green),alpha(alpha){}*/
+    void init(){memset(this,0,5);}
+    uint8_t getRed() const{return this->red;}
+    uint8_t getBlue() const{return this->blue;}
+    uint8_t getGreen() const{return this->green;}
+    uint8_t getAlpha() const{return this->alpha;}
+    uint8_t getLayerNumbe() const{return this->alpha;}
 
-    int8_t getRed() const{return this->red;}
-    int8_t getBlue() const{return this->blue;}
-    int8_t getGreen() const{return this->green;}
-    int8_t getAlpha() const{return this->alpha;}
-    int8_t getLayerNumbe() const{return this->alpha;}
 
+    void setRed(uint8_t value){this->red=value;}
+    void setBlue(uint8_t value){this->blue=value;}
+    void setGreen(uint8_t value){this->green=value;}
+    void setAlpha(uint8_t value){this->alpha=value;}
+    void setLayerNumber(uint8_t layerNumber){this->layerNumber=layerNumber;}
 
-    void setRed(int8_t value){this->red=value;}
-    void setBlue(int8_t value){this->blue=value;}
-    void setGreen(int8_t value){this->green=value;}
-    void setAlpha(int8_t value){this->alpha=value;}
-    void setLayerNumber(int8_t layerNumber){this->layerNumber=layerNumber;}
+    Point& operator+(const Point& otherPoint){
+        uint8_t alpha1=alpha;
+        uint8_t alpha2=otherPoint.getAlpha();
+        
+        //map the alpha from 0-255 to 0.0-1.0
+        double alphaFront=alpha/256.0;
+
+        //get update the new color and the alpha
+        red=(int8_t)(red*(1-alphaFront)+otherPoint.getRed()*alphaFront);
+        blue=(int8_t)(blue*(1-alphaFront)+otherPoint.getBlue()*alphaFront);
+        green=(int8_t)(green*(1-alphaFront)+otherPoint.getGreen()*alphaFront);
+        alpha=(int8_t)(alpha+otherPoint.getAlpha()*(1-alphaFront));
+
+        //return the first point
+        return *this;
+    }
 };
 
 class Layer
