@@ -4,7 +4,7 @@
 
 #include<bits/stdc++.h>
 
-#define pointMatrix std::vector<std::vector<Point>>
+#define pointMatrix std::vector<std::vector<Point> >
 
 namespace dude
 {
@@ -55,11 +55,14 @@ private:
     bool isValid;
     std::string name;
 public:
-    std::vector<std::vector<Point>>* matrix;
+    std::vector<std::vector<Point> >* matrix;
     Layer(){}
-    Layer(uint8_t layerNumber,uint16_t length,uint16_t width,std::string name,std::vector<std::vector<Point>>* matrix,bool isValid=true):
+    Layer(uint8_t layerNumber,uint16_t length,uint16_t width,std::string name,std::vector<std::vector<Point> >* matrix,bool isValid=true):
         layerNumber(layerNumber),length(length),width(width),name(name),matrix(matrix){}
 
+    ~Layer(){
+        if(matrix!=nullptr)delete matrix;
+    }
     void init(){
         layerNumber=0;
         length=1024;
@@ -95,7 +98,7 @@ public:
     void setLenth(uint16_t newLength){
         this->length=newLength;
         //use a new matrix to handle the data
-        std::vector<std::vector<Point>> newMatrix(width,std::vector<Point>(length));
+        std::vector<std::vector<Point> > newMatrix(width,std::vector<Point>(length));
         //change the matrix     TODO!!!
 
         //write the new matrix back to the original matrix     TODO!!!
@@ -104,7 +107,7 @@ public:
     void setWith(uint16_t newWidth){
         this->width=newWidth;
         //use a new matrix to handle the data
-        std::vector<std::vector<Point>> newMatrix(width,std::vector<Point>(length));
+        std::vector<std::vector<Point> > newMatrix(width,std::vector<Point>(length));
         //change the matrix     TODO!!!
 
         //write the new matrix back to the original matrix     TODO!!!
@@ -112,14 +115,14 @@ public:
     }
     uint16_t getLength(){return this->length;}
     uint16_t getWidth(){return this->width;}
-    std::vector<std::vector<Point>>* getMatrix(){return matrix;}
+    std::vector<std::vector<Point> >* getMatrix(){return matrix;}
     void setName(std::string name){this->name=name;}
     void setValid(){this->isValid=true;}
     void setInvalid(){this->isValid=false;}
 };
 
 
-/*
+
 class Image
 {
 private:
@@ -128,9 +131,12 @@ private:
     Layer* toDisplay;
     Layer* tmpLayer;
 public:
-    Image();
+    Image(){toDisplay=nullptr;tmpLayer=nullptr;}
     Image(std::vector<Layer*>& layers,std::string& name,Layer* toDisplay,Layer* tmpLayer):
         layers(layers),name(name),toDisplay(toDisplay),tmpLayer(tmpLayer){}
+
+    Layer* getLayerToDisplay(){return toDisplay;}
+    Layer* getLayerCurrent(){return tmpLayer;}
     
     Layer* LayerMerge(uint8_t index1,uint8_t index2){
         Layer* layer1=layers[index1];
@@ -139,16 +145,16 @@ public:
         if(layer1->getLength()!=layer2->getLength())return nullptr;
         if(layer1->getWidth()!=layer2->getLength())return nullptr;
 
-        std::vector<std::vector<Point>>& matrix1=layer1->getMatrix();
-        std::vector<std::vector<Point>>& matrix2=layer2->getMatrix();
+        std::vector<std::vector<Point> > matrix1=*(layer1->getMatrix());
+        std::vector<std::vector<Point> > matrix2=*(layer2->getMatrix());
         
         //To be modified because the merge of two layer actully depend on the alpha value
         for(int i=0;i<layer1->getWidth();++i){
             for(int j=0;j<layer1->getLength();++j){
-                tmpLayer->matrix[i][j].setRed((matrix1[i][j].getRed()+matrix2[i][j].getRed())/2);
-                tmpLayer->matrix[i][j].setBlue((matrix1[i][j].getBlue()+matrix2[i][j].getBlue())/2);
-                tmpLayer->matrix[i][j].setGreen((matrix1[i][j].getGreen()+matrix2[i][j].getGreen())/2);
-                tmpLayer->matrix[i][j].setAlpha((matrix1[i][j].getAlpha()+matrix2[i][j].getAlpha())/2);
+                (*tmpLayer->matrix)[i][j].setRed((matrix1[i][j].getRed()+matrix2[i][j].getRed())/2);
+                (*tmpLayer->matrix)[i][j].setBlue((matrix1[i][j].getBlue()+matrix2[i][j].getBlue())/2);
+                (*tmpLayer->matrix)[i][j].setGreen((matrix1[i][j].getGreen()+matrix2[i][j].getGreen())/2);
+                (*tmpLayer->matrix)[i][j].setAlpha((matrix1[i][j].getAlpha()+matrix2[i][j].getAlpha())/2);
             }
         }
         //delete the layer from the layers
@@ -177,17 +183,17 @@ public:
                 for(int j=0;j<length;++j){
                     for(int k=0;k<layers.size();++k){
                         //just a demo, need to modifie
-                        toDisplay->matrix[i][j].setRed(toDisplay->matrix[i][j].getRed()+layers[k]->matrix[i][j].getRed());
-                        toDisplay->matrix[i][j].setBlue(toDisplay->matrix[i][j].getBlue()+layers[k]->matrix[i][j].getBlue());
-                        toDisplay->matrix[i][j].setGreen(toDisplay->matrix[i][j].getGreen()+layers[k]->matrix[i][j].getGreen());
-                        toDisplay->matrix[i][j].setAlpha(toDisplay->matrix[i][j].getAlpha()+layers[k]->matrix[i][j].getAlpha());
+                        (*toDisplay->matrix)[i][j].setRed((*toDisplay->matrix)[i][j].getRed()+(*layers[k]->matrix)[i][j].getRed());
+                        (*toDisplay->matrix)[i][j].setBlue((*toDisplay->matrix)[i][j].getBlue()+(*layers[k]->matrix)[i][j].getBlue());
+                        (*toDisplay->matrix)[i][j].setGreen((*toDisplay->matrix)[i][j].getGreen()+(*layers[k]->matrix)[i][j].getGreen());
+                        (*toDisplay->matrix)[i][j].setAlpha((*toDisplay->matrix)[i][j].getAlpha()+(*layers[k]->matrix)[i][j].getAlpha());
                     }
                 }
             }
         }
         return toDisplay;
     }
-};*/
+};
 }
 
 

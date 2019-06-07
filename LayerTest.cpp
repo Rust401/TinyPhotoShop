@@ -2,9 +2,15 @@
 
 using namespace dude;
 
+void foo()
+{
+    Layer l2;
+    std::cout<<"foo end"<<std::endl;
+}
 
 int main()
 {
+    foo();
     Layer l1;
     //l1.displayLayerInfo();
     l1.init();
