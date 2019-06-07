@@ -55,9 +55,9 @@ private:
     bool isValid;
     std::string name;
 public:
-    std::vector<std::vector<Point>> matrix;
+    std::vector<std::vector<Point>>* matrix;
     Layer(){}
-    Layer(uint8_t layerNumber,uint16_t length,uint16_t width,std::string name,std::vector<std::vector<Point>>& matrix,bool isValid=true):
+    Layer(uint8_t layerNumber,uint16_t length,uint16_t width,std::string name,std::vector<std::vector<Point>>* matrix,bool isValid=true):
         layerNumber(layerNumber),length(length),width(width),name(name),matrix(matrix){}
 
     void init(){
@@ -66,15 +66,28 @@ public:
         width=1024;
         isValid=true;
         name="";
-        matrix=*(new pointMatrix(1024,std::vector<Point>(1024,Point(0,0,0,0,0))));
+        matrix=new pointMatrix(1024,std::vector<Point>(1024,Point(0,0,0,0,0)));
+    }
+
+    void reInit(uint8_t layerNumber,uint16_t length,uint16_t width,bool isValid,std::string name)
+    {
+        this->layerNumber=layerNumber;
+        this->length=length;
+        this->width=width;
+        this->isValid=isValid;
+        this->name=name;
+        delete matrix;
+        matrix=new pointMatrix(width,std::vector<Point>(length,Point(0,0,0,0,0)));
     }
     
     void displayLayerInfo(){
+        std::cout<<"//--------------------------------------------------------------------//"<<std::endl;
         std::cout<<"LayerNubmer  :"<<(int16_t)layerNumber<<std::endl;
         std::cout<<"Length       :"<<length<<std::endl;
         std::cout<<"Width        :"<<width<<std::endl;
         std::cout<<"IsValid      :"<<isValid<<std::endl;
-        std::cout<<"MatrixAddr   :"<<&matrix<<std::endl;
+        std::cout<<"MatrixAddr   :"<<matrix<<std::endl;
+        std::cout<<"//--------------------------------------------------------------------//"<<std::endl;
     }
 
     void setLayerNumber(uint8_t val){layerNumber=val;}
@@ -99,12 +112,14 @@ public:
     }
     uint16_t getLength(){return this->length;}
     uint16_t getWidth(){return this->width;}
-    std::vector<std::vector<Point>>& getMatrix(){return matrix;}
+    std::vector<std::vector<Point>>* getMatrix(){return matrix;}
     void setName(std::string name){this->name=name;}
     void setValid(){this->isValid=true;}
     void setInvalid(){this->isValid=false;}
 };
 
+
+/*
 class Image
 {
 private:
@@ -172,8 +187,9 @@ public:
         }
         return toDisplay;
     }
-};
+};*/
 }
+
 
 
 #endif //POINT_H

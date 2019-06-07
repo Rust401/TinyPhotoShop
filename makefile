@@ -1,10 +1,10 @@
-all: point
+all: layer
 
-point:
+point: clean
 	g++ -o point PointTest.cpp
 	./point
 
-layer:
+layer: clean
 	g++ -o layer LayerTest.cpp
 	./layer
 
