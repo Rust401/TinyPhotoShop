@@ -46,6 +46,7 @@ public:
     }
 };
 
+//alloc the object on the heap, don't in the stack!!!
 class Layer
 {
 private:
@@ -135,8 +136,35 @@ public:
     Image(std::vector<Layer*>& layers,std::string& name,Layer* toDisplay,Layer* tmpLayer):
         layers(layers),name(name),toDisplay(toDisplay),tmpLayer(tmpLayer){}
 
-    Layer* getLayerToDisplay(){return toDisplay;}
-    Layer* getLayerCurrent(){return tmpLayer;}
+    ~Image(){
+        for(auto dude: layers){
+            if(dude!=nullptr){
+                delete dude;
+                dude=nullptr;
+            }
+        }
+    }
+
+    void Init(){
+        if(layers.size()!=0)layers.clear();
+        Layer* p=new Layer();
+        p->init();
+        layers.push_back(p);
+        name="";
+        toDisplay=layers[0];
+        tmpLayer=layers[0];
+    }
+    
+
+    Layer* getLayerToDisplayPointer(){return toDisplay;}
+    Layer* getLayerCurrentPointer(){return tmpLayer;}
+    void pushLayerFront(Layer* layer){
+        if(layer!=nullptr)layers.push_back(layer);
+        if(layers.size()>1)std::swap(layers[1],layers.back());
+    }
+    void pushLayerBack(Layer* layer){
+        if(layer!=nullptr)layers.push_back(layer);
+    }
     
     Layer* LayerMerge(uint8_t index1,uint8_t index2){
         Layer* layer1=layers[index1];
