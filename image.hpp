@@ -85,13 +85,12 @@ public:
     }
     
     void displayLayerInfo(){
-        std::cout<<"//--------------------------------------------------------------------//"<<std::endl;
+        std::cout<<std::endl;
         std::cout<<"LayerNubmer  :"<<(int16_t)layerNumber<<std::endl;
         std::cout<<"Length       :"<<length<<std::endl;
         std::cout<<"Width        :"<<width<<std::endl;
         std::cout<<"IsValid      :"<<isValid<<std::endl;
         std::cout<<"MatrixAddr   :"<<matrix<<std::endl;
-        std::cout<<"//--------------------------------------------------------------------//"<<std::endl;
     }
 
     void setLayerNumber(uint8_t val){layerNumber=val;}
@@ -131,8 +130,9 @@ private:
     std::string name;
     Layer* toDisplay;
     Layer* tmpLayer;
+    Layer* currentLayer;
 public:
-    Image(){toDisplay=nullptr;tmpLayer=nullptr;}
+    Image(){toDisplay=nullptr;tmpLayer=nullptr;currentLayer=nullptr;}
     Image(std::vector<Layer*>& layers,std::string& name,Layer* toDisplay,Layer* tmpLayer):
         layers(layers),name(name),toDisplay(toDisplay),tmpLayer(tmpLayer){}
 
@@ -153,11 +153,20 @@ public:
         name="";
         toDisplay=layers[0];
         tmpLayer=layers[0];
+        currentLayer=layers[0];
     }
-    
 
-    Layer* getLayerToDisplayPointer(){return toDisplay;}
-    Layer* getLayerCurrentPointer(){return tmpLayer;}
+    int16_t getLayerSize() const {return layers.size();}
+    void displayLayerInfo(){
+        std::cout<<"name:         "<<name<<std::endl;
+        std::cout<<"layerSize:    "<<getLayerSize()<<std::endl;
+        std::cout<<"toDisplay:    "<<(toDisplay==nullptr?0:toDisplay)<<std::endl;
+        std::cout<<"tmpLayer:     "<<(tmpLayer==nullptr?0:tmpLayer)<<std::endl;
+        std::cout<<"currentLayer  "<<(currentLayer==nullptr?0:currentLayer)<<std::endl;
+        for(auto dude:layers)dude->displayLayerInfo();
+        return;
+    }
+
     void pushLayerFront(Layer* layer){
         if(layer!=nullptr)layers.push_back(layer);
         if(layers.size()>1)std::swap(layers[1],layers.back());
