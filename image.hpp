@@ -133,9 +133,13 @@ private:
     Layer* currentLayer;
 public:
     Image(){toDisplay=nullptr;tmpLayer=nullptr;currentLayer=nullptr;}
+
     Image(std::vector<Layer*>& layers,std::string& name,Layer* toDisplay,Layer* tmpLayer):
         layers(layers),name(name),toDisplay(toDisplay),tmpLayer(tmpLayer){}
 
+    //We allocate all the Layer obeject in the heap use the "new Layer" method
+    //So the d-constructor shold release the memory in the heap address
+    //---------------------------------------------------
     ~Image(){
         for(auto dude: layers){
             if(dude!=nullptr){
@@ -156,7 +160,33 @@ public:
         currentLayer=layers[0];
     }
 
+    //the "get" functions
+    //---------------------------------------------------
     int16_t getLayerSize() const {return layers.size();}
+    
+    std::vector<Layer*>& getLayers() {return layers;}
+
+    //std::vector<Layer* >* getLayersPointer() const{return &layers;}
+
+    Layer* getLayerToDisplay() const {return toDisplay;}
+
+    Layer* getCurrentLayer() const{return currentLayer;}
+
+    //the "set" functions
+    //We modified the dude here
+    //---------------------------------------------------
+    void setLayerToDisplay(int16_t index){
+        if(index>layers.size())return;
+        if(layers[index]!=nullptr)toDisplay=layers[index];
+    }
+
+    void setCurrentLayer(int16_t index){
+        if(index>layers.size())return;
+        if(layers[index]!=nullptr)currentLayer=layers[index];
+    }
+
+    //display the image info ,include the info of the layers
+    //----------------------------------------------------
     void displayLayerInfo(){
         std::cout<<"name:         "<<name<<std::endl;
         std::cout<<"layerSize:    "<<getLayerSize()<<std::endl;
