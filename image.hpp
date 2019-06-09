@@ -121,6 +121,7 @@ public:
     }
     uint16_t getLength(){return this->length;}
     uint16_t getWidth(){return this->width;}
+    uint16_t getLayerNumber(){return this->layerNumber;}
     std::vector<std::vector<Point> >* getMatrix(){return matrix;}
     void setName(std::string name){this->name=name;}
     void setValid(){this->isValid=true;}
@@ -169,33 +170,43 @@ public:
         currentLayer=layers[0];
     }
 
-    //the "get" functions
-    //---------------------------------------------------
+    //===----------------------------------------------------------------------===//
+    // Get funciotion
+    //===----------------------------------------------------------------------===//
+
+    //Return the number of the layer in the current image
     int16_t getLayerSize() const {return layers.size();}
     
+    //Get the reference of the layer vector 
     std::vector<Layer*>& getLayers() {return layers;}
 
+    //Get the pointer of the layer vector
     std::vector<Layer* >* getLayersPointer() {return &layers;}
 
+    //Get the pointer to the layer to be display
     Layer* getLayerToDisplay() const {return toDisplay;}
 
+    //Get the pointer to the layer which is selected
     Layer* getCurrentLayer() const{return currentLayer;}
 
-    //the "set" functions
-    //We modified the dude here
-    //---------------------------------------------------
+
+    //===----------------------------------------------------------------------===//
+    // Set function
+    //===----------------------------------------------------------------------===//
+
+    //implicit set the display layer to layer with some index
     void setLayerToDisplay(int16_t index){
         if(index>layers.size())return;
         if(layers[index]!=nullptr)toDisplay=layers[index];
     }
 
+    //implicit set the current layer to layer with some index
     void setCurrentLayer(int16_t index){
         if(index>layers.size())return;
         if(layers[index]!=nullptr)currentLayer=layers[index];
     }
 
-    //display the image info ,include the info of the layers
-    //----------------------------------------------------
+    //Display the layer info to the stdout
     void displayLayerInfo(){
         std::cout<<"name:         "<<name<<std::endl;
         std::cout<<"layerSize:    "<<getLayerSize()<<std::endl;
@@ -206,41 +217,112 @@ public:
         return;
     }
 
+    //===----------------------------------------------------------------------===//
+    // Transfer function
+    //===----------------------------------------------------------------------===//
+
+    //Push a new layer to front of the vector
     void pushLayerFront(Layer* layer){
         if(layer!=nullptr)layers.push_back(layer);
         if(layers.size()>1)std::swap(layers[1],layers.back());
     }
+
+    //push a new layer to the end of the vector
     void pushLayerBack(Layer* layer){
         if(layer!=nullptr)layers.push_back(layer);
     }
-    
-    Layer* LayerMerge(uint8_t index1,uint8_t index2){
-        Layer* layer1=layers[index1];
-        Layer* layer2=layers[index2];
-        
-        if(layer1->getLength()!=layer2->getLength())return nullptr;
-        if(layer1->getWidth()!=layer2->getLength())return nullptr;
 
-        std::vector<std::vector<Point> > matrix1=*(layer1->getMatrix());
-        std::vector<std::vector<Point> > matrix2=*(layer2->getMatrix());
-        
-        //To be modified because the merge of two layer actully depend on the alpha value
-        for(int i=0;i<layer1->getWidth();++i){
-            for(int j=0;j<layer1->getLength();++j){
-                (*tmpLayer->matrix)[i][j].setRed((matrix1[i][j].getRed()+matrix2[i][j].getRed())/2);
-                (*tmpLayer->matrix)[i][j].setBlue((matrix1[i][j].getBlue()+matrix2[i][j].getBlue())/2);
-                (*tmpLayer->matrix)[i][j].setGreen((matrix1[i][j].getGreen()+matrix2[i][j].getGreen())/2);
-                (*tmpLayer->matrix)[i][j].setAlpha((matrix1[i][j].getAlpha()+matrix2[i][j].getAlpha())/2);
+    //Check before the sergery
+    bool canBeMerged(uint8_t index1,uint8_t index2){
+        //The check before the sergery
+        if(index1==index2){
+            std::cout<<"The same layer, do nothin"<<std::endl;
+            return false;
+        }
+        if(index1>=layers.size()||index2>=layers.size()){
+            std::cout<<"No such many layers dude"<<std::endl;
+            return false;
+        }
+        if(layers[index1]==nullptr||layers[index2]==nullptr){
+            std::cout<<"One of the layers is empty, nothing to do"<<std::endl;
+            return false;
+        }
+        if(layers[index1]->getLength()!=layers[index2]->getLength()||layers[index1]->getWidth()!=layers[index2]->getWidth()){
+            std::cout<<"The size of two layer is not the same"<<std::endl;
+            return false;
+        }
+        return true;
+    }
+
+    //The core function to merge the l1,l2 and put the result into l3
+    bool mergeCore(Layer* l1,Layer* l2,Layer* l3){
+        for(int i=0;i<l1->getWidth();++i){
+            for(int j=0;j<l1->getLength();++j){
+                (*(l3->matrix))[i][j].setRed(((*(l1->matrix))[i][j].getRed()+(*(l1->matrix))[i][j].getRed())/2);
+                (*(l3->matrix))[i][j].setBlue(((*(l1->matrix))[i][j].getBlue()+(*(l1->matrix))[i][j].getBlue())/2);
+                (*(l3->matrix))[i][j].setGreen(((*(l1->matrix))[i][j].getGreen()+(*(l1->matrix))[i][j].getGreen())/2);
+                (*(l3->matrix))[i][j].setAlpha(((*(l1->matrix))[i][j].getAlpha()+(*(l1->matrix))[i][j].getAlpha())/2);
             }
         }
-        //delete the layer from the layers
-        layers.erase(layers.begin()+index1);
-        layers.erase(layers.begin()+index2);
-
-        //notice we should set the layer merged the layerNumber, and then return it
-        //should we put it right into the vector? in the front or int the end?
-        return tmpLayer;
+        if(nullptr!=l3)return true;
+        return false;
     }
+    //give the index of the layer and merge it, then replace the first layer and delete the second layer
+    //The algorithm here is just get the mean of the two attributes of 2 pont mapped
+    //The core function, change here
+    bool layerMerge(uint8_t index1,uint8_t index2){
+
+        //The check before the sergery
+        if(!canBeMerged(index1,index2))return false;
+        //Check ended
+
+        Layer* l1=layers[index1];
+        Layer* l2=layers[index2];
+
+        //The ner layer to save the result
+        Layer* l3=new Layer();
+        l3->reInit(l2->getLayerNumber(),l1->getLayerNumber(),l1->getWidth(),true,"");
+
+        //The algorithm here is just get the mean of the two attributes of 2 pont mapped
+        //The core function, change here
+        if(!mergeCore(l1,l2,l3))return false;
+        
+        delete l1;
+        layers[index1]=nullptr;
+        delete l2;
+        layers[index2]=nullptr;
+        layers[index1]=l3;
+        if(l3!=nullptr)return true;
+        std::cout<<"lose the layer merged, merge failed"<<std::endl;
+        return false;
+    }
+
+    //This method merge two layer and push them to the end of the vector without delete the former layer
+    bool layerMergeAndPushBack(uint8_t index1,uint8_t index2){
+
+        //The check before the sergery
+        if(!canBeMerged(index1,index2))return false;
+        //Check ended
+
+        Layer* l1=layers[index1];
+        Layer* l2=layers[index2];
+
+        //The ner layer to save the result
+        Layer* l3=new Layer();
+        l3->reInit(l2->getLayerNumber(),l1->getLayerNumber(),l1->getWidth(),true,"");
+
+        //The algorithm here is just get the mean of the two attributes of 2 pont mapped
+        //The core function, change here
+        if(!mergeCore(l1,l2,l3))return false;
+        
+        if(nullptr!=l3){
+            layers.push_back(l3);
+            return true;
+        }
+        std::cout<<"lose the layer merged, merge failed"<<std::endl;
+        return false;
+    }
+    
 
     Layer* getTheLayerToDisplay()
     {

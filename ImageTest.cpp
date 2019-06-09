@@ -2,11 +2,15 @@
 using namespace dude;
 
 
-//The test of the class
+
 int main()
 {
+
+    
+    
     Image i1;
     i1.Init();
+
 
 
     Layer* l1=new Layer();
@@ -31,6 +35,9 @@ int main()
         (*p)[i]->displayLayerInfo();
     }
 
+  
+
     //i1.displayLayerInfo();
     return 0;
+    
 }
