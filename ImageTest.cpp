@@ -1,43 +1,40 @@
 #include "image.hpp"
 using namespace dude;
 
-
-
 int main()
 {
-
-    
-    
     Image i1;
     i1.Init();
-
-
+    //i1.displayLayerInfo();
 
     Layer* l1=new Layer();
+    //l1->displayLayerInfo();
+    l1->reInit(1,2000,2000,true,"layer1");
+    //l1->displayLayerInfo();
 
-    l1->init();
-    l1->reInit(1,100,100,true,"shabi");
-
-    i1.pushLayerBack(l1);
     Layer* l2=new Layer();
-    l2->init();
-    l2->reInit(3,500,600,true,"baichi");
+    l2->reInit(2,2000,2000,true,"layer2");
+
 
     Layer* l3=new Layer();
-    l3->init();
-    l3->reInit(5,1500,1500,true,"ruozhi");
+    l3->reInit(3,2000,2000,true,"layer3");
 
-    i1.pushLayerBack(l2);
-    i1.pushLayerBack(l3);
+    Layer* l4=new Layer();
+    l4->reInit(3,2000,2000,true,"layer4");
 
-    layerVector* p=i1.getLayersPointer();
-    for(int i=0;i<(*p).size();++i){
-        (*p)[i]->displayLayerInfo();
-    }
 
-  
+    //0
+    i1.pushLayerBack(l1);//1
+    i1.pushLayerBack(l2);//2
+    i1.pushLayerBack(l3);//3
+    i1.pushLayerBack(l4);//4
+                            
 
-    //i1.displayLayerInfo();
-    return 0;
+
+    //A server bug to fix
+    i1.layerMerge(3,4);
+
     
+    
+    i1.displayLayerInfo();
 }

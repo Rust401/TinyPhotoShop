@@ -149,12 +149,19 @@ public:
     //So the d-constructor shold release the memory in the heap address
     //---------------------------------------------------
     ~Image(){
-        for(auto dude: layers){
-            if(dude!=nullptr){
-                delete dude;
-                dude=nullptr;
-            }
-        }
+        //Here may contain a server bug when delelete  the layer on the heap
+        
+        std::unordered_set<Layer*> aSet;
+        for(int i=0;i<layers.size();++i){
+            std::cout<<"fuck"<<std::endl;
+            if(layers[i]==nullptr)continue;
+            if(!aSet.count(layers[i])){
+                aSet.insert(layers[i]);
+                std::cout<<"before delte"<<std::endl;
+                if(nullptr!=layers[i])if(i==1)delete layers[i];
+                std::cout<<"after delete"<< std::endl;
+            }     
+        }   
     }
 
     //The init() function will give the image vector a blank layer will size of 1024*1024
@@ -208,12 +215,16 @@ public:
 
     //Display the layer info to the stdout
     void displayLayerInfo(){
+        std::cout<<"//----------------Layer Info-----------------//"<<std::endl;
         std::cout<<"name:         "<<name<<std::endl;
         std::cout<<"layerSize:    "<<getLayerSize()<<std::endl;
         std::cout<<"toDisplay:    "<<(toDisplay==nullptr?0:toDisplay)<<std::endl;
         std::cout<<"tmpLayer:     "<<(tmpLayer==nullptr?0:tmpLayer)<<std::endl;
         std::cout<<"currentLayer  "<<(currentLayer==nullptr?0:currentLayer)<<std::endl;
-        for(auto dude:layers)dude->displayLayerInfo();
+        for(auto dude:layers){
+            if(dude!=nullptr)dude->displayLayerInfo();
+            else std::cout<<"\nZombie Layer \n";
+        }
         return;
     }
 
@@ -223,8 +234,7 @@ public:
 
     //Push a new layer to front of the vector
     void pushLayerFront(Layer* layer){
-        if(layer!=nullptr)layers.push_back(layer);
-        if(layers.size()>1)std::swap(layers[1],layers.back());
+        if(layer!=nullptr)layers.insert(layers.begin(),layer);
     }
 
     //push a new layer to the end of the vector
@@ -255,6 +265,7 @@ public:
     }
 
     //The core function to merge the l1,l2 and put the result into l3
+    //This is not the point to be fucked
     bool mergeCore(Layer* l1,Layer* l2,Layer* l3){
         for(int i=0;i<l1->getWidth();++i){
             for(int j=0;j<l1->getLength();++j){
@@ -266,10 +277,12 @@ public:
         }
         if(nullptr!=l3)return true;
         return false;
+       return true;
     }
     //give the index of the layer and merge it, then replace the first layer and delete the second layer
     //The algorithm here is just get the mean of the two attributes of 2 pont mapped
     //The core function, change here
+    //BUG HERE TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
     bool layerMerge(uint8_t index1,uint8_t index2){
 
         //The check before the sergery
