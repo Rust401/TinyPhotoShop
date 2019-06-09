@@ -5,6 +5,7 @@
 #include<bits/stdc++.h>
 
 #define pointMatrix std::vector<std::vector<Point> >
+#define layerVector std::vector<dude::Layer*>
 
 namespace dude
 {
@@ -64,6 +65,9 @@ public:
     ~Layer(){
         if(matrix!=nullptr)delete matrix;
     }
+
+    //The Layer::init() give the layer a 1024*1024 Point matrix with all the Point obj set to the zero
+    //Every time after new a Layer obj in the heap, be sure to init() or reInit()
     void init(){
         layerNumber=0;
         length=1024;
@@ -73,6 +77,8 @@ public:
         matrix=new pointMatrix(1024,std::vector<Point>(1024,Point(0,0,0,0,0)));
     }
 
+    //Delete the current layer matrix in the heap and give it the new size you want
+    //All the Points in the layer are blank
     void reInit(uint8_t layerNumber,uint16_t length,uint16_t width,bool isValid,std::string name)
     {
         this->layerNumber=layerNumber;
@@ -132,6 +138,7 @@ private:
     Layer* tmpLayer;
     Layer* currentLayer;
 public:
+    //default constructor do nothing and set all the pointer to nullptr
     Image(){toDisplay=nullptr;tmpLayer=nullptr;currentLayer=nullptr;}
 
     Image(std::vector<Layer*>& layers,std::string& name,Layer* toDisplay,Layer* tmpLayer):
@@ -149,6 +156,8 @@ public:
         }
     }
 
+    //The init() function will give the image vector a blank layer will size of 1024*1024
+    //with all the data in the point to be zero
     void Init(){
         if(layers.size()!=0)layers.clear();
         Layer* p=new Layer();
@@ -166,7 +175,7 @@ public:
     
     std::vector<Layer*>& getLayers() {return layers;}
 
-    //std::vector<Layer* >* getLayersPointer() const{return &layers;}
+    std::vector<Layer* >* getLayersPointer() {return &layers;}
 
     Layer* getLayerToDisplay() const {return toDisplay;}
 
