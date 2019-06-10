@@ -149,17 +149,12 @@ public:
     //So the d-constructor shold release the memory in the heap address
     //---------------------------------------------------
     ~Image(){
-        //Here may contain a server bug when delelete  the layer on the heap
-        
         std::unordered_set<Layer*> aSet;
         for(int i=0;i<layers.size();++i){
-            std::cout<<"fuck"<<std::endl;
             if(layers[i]==nullptr)continue;
             if(!aSet.count(layers[i])){
                 aSet.insert(layers[i]);
-                std::cout<<"before delte"<<std::endl;
-                if(nullptr!=layers[i])if(i==1)delete layers[i];
-                std::cout<<"after delete"<< std::endl;
+                if(nullptr!=layers[i])delete layers[i];
             }     
         }   
     }
@@ -246,19 +241,19 @@ public:
     bool canBeMerged(uint8_t index1,uint8_t index2){
         //The check before the sergery
         if(index1==index2){
-            std::cout<<"The same layer, do nothin"<<std::endl;
+            std::cerr<<"The same layer, do nothin"<<std::endl;
             return false;
         }
         if(index1>=layers.size()||index2>=layers.size()){
-            std::cout<<"No such many layers dude"<<std::endl;
+            std::cerr<<"No such many layers dude"<<std::endl;
             return false;
         }
         if(layers[index1]==nullptr||layers[index2]==nullptr){
-            std::cout<<"One of the layers is empty, nothing to do"<<std::endl;
+            std::cerr<<"One of the layers is empty, nothing to do"<<std::endl;
             return false;
         }
         if(layers[index1]->getLength()!=layers[index2]->getLength()||layers[index1]->getWidth()!=layers[index2]->getWidth()){
-            std::cout<<"The size of two layer is not the same"<<std::endl;
+            std::cerr<<"The size of two layer is not the same"<<std::endl;
             return false;
         }
         return true;
@@ -272,21 +267,18 @@ public:
         
         for(int i=0;i<l1->getWidth();++i){
             for(int j=0;j<l1->getLength();++j){
-                (*(l3->matrix))[i][j].setRed(((*(l1->matrix))[i][j].getRed()+(*(l1->matrix))[i][j].getRed())/2);
-                (*(l3->matrix))[i][j].setBlue(((*(l1->matrix))[i][j].getBlue()+(*(l1->matrix))[i][j].getBlue())/2);
-                (*(l3->matrix))[i][j].setGreen(((*(l1->matrix))[i][j].getGreen()+(*(l1->matrix))[i][j].getGreen())/2);
-                (*(l3->matrix))[i][j].setAlpha(((*(l1->matrix))[i][j].getAlpha()+(*(l1->matrix))[i][j].getAlpha())/2);                
+                (*(l3->matrix))[i][j].setRed(((*(l1->matrix))[i][j].getRed()+(*(l2->matrix))[i][j].getRed())/2);
+                (*(l3->matrix))[i][j].setBlue(((*(l1->matrix))[i][j].getBlue()+(*(l2->matrix))[i][j].getBlue())/2);
+                (*(l3->matrix))[i][j].setGreen(((*(l1->matrix))[i][j].getGreen()+(*(l2->matrix))[i][j].getGreen())/2);
+                (*(l3->matrix))[i][j].setAlpha(((*(l1->matrix))[i][j].getAlpha()+(*(l2->matrix))[i][j].getAlpha())/2);                
             }
         }
-        
         return true;
     }
     //give the index of the layer and merge it, then replace the first layer and delete the second layer
     //The algorithm here is just get the mean of the two attributes of 2 pont mapped
     //The core function, change here
-    //BUG HERE TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
     bool layerMerge(uint8_t index1,uint8_t index2){
-
 
         //The check before the sergery
         if(!canBeMerged(index1,index2))return false;
@@ -297,7 +289,7 @@ public:
 
         //The new layer to save the result
         Layer* l3=new Layer();
-        l3->reInit(l2->getLayerNumber(),l1->getLength(),l1->getWidth(),true,"");
+        l3->reInit(l1->getLayerNumber(),l1->getLength(),l1->getWidth(),true,"");
 
         //The algorithm here is just get the mean of the two attributes of 2 point mapped
         //The core function, change here
@@ -309,7 +301,7 @@ public:
         layers[index2]=nullptr;
         layers[index1]=l3;
         if(l3!=nullptr)return true;
-        std::cout<<"lose the layer merged, merge failed"<<std::endl;
+        std::cerr<<"lose the layer merged, merge failed"<<std::endl;
         return false;
     }
 
@@ -335,7 +327,7 @@ public:
             layers.push_back(l3);
             return true;
         }
-        std::cout<<"lose the layer merged, merge failed"<<std::endl;
+        std::cerr<<"lose the layer merged, merge failed"<<std::endl;
         return false;
     }
     
