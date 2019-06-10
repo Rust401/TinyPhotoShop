@@ -266,24 +266,27 @@ public:
 
     //The core function to merge the l1,l2 and put the result into l3
     //This is not the point to be fucked
+
     bool mergeCore(Layer* l1,Layer* l2,Layer* l3){
+        if(l1==nullptr||l2==nullptr||l3==nullptr)return false;
+        
         for(int i=0;i<l1->getWidth();++i){
             for(int j=0;j<l1->getLength();++j){
                 (*(l3->matrix))[i][j].setRed(((*(l1->matrix))[i][j].getRed()+(*(l1->matrix))[i][j].getRed())/2);
                 (*(l3->matrix))[i][j].setBlue(((*(l1->matrix))[i][j].getBlue()+(*(l1->matrix))[i][j].getBlue())/2);
                 (*(l3->matrix))[i][j].setGreen(((*(l1->matrix))[i][j].getGreen()+(*(l1->matrix))[i][j].getGreen())/2);
-                (*(l3->matrix))[i][j].setAlpha(((*(l1->matrix))[i][j].getAlpha()+(*(l1->matrix))[i][j].getAlpha())/2);
+                (*(l3->matrix))[i][j].setAlpha(((*(l1->matrix))[i][j].getAlpha()+(*(l1->matrix))[i][j].getAlpha())/2);                
             }
         }
-        if(nullptr!=l3)return true;
-        return false;
-       return true;
+        
+        return true;
     }
     //give the index of the layer and merge it, then replace the first layer and delete the second layer
     //The algorithm here is just get the mean of the two attributes of 2 pont mapped
     //The core function, change here
     //BUG HERE TODO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11
     bool layerMerge(uint8_t index1,uint8_t index2){
+
 
         //The check before the sergery
         if(!canBeMerged(index1,index2))return false;
@@ -292,14 +295,14 @@ public:
         Layer* l1=layers[index1];
         Layer* l2=layers[index2];
 
-        //The ner layer to save the result
+        //The new layer to save the result
         Layer* l3=new Layer();
-        l3->reInit(l2->getLayerNumber(),l1->getLayerNumber(),l1->getWidth(),true,"");
+        l3->reInit(l2->getLayerNumber(),l1->getLength(),l1->getWidth(),true,"");
 
-        //The algorithm here is just get the mean of the two attributes of 2 pont mapped
+        //The algorithm here is just get the mean of the two attributes of 2 point mapped
         //The core function, change here
         if(!mergeCore(l1,l2,l3))return false;
-        
+     
         delete l1;
         layers[index1]=nullptr;
         delete l2;
