@@ -1,16 +1,16 @@
-all: layer
+all: image
 
 point: clean
-	g++ -o point PointTest.cpp
+	clang++ -std=c++11 -o point PointTest.cpp
 	./point
 
 layer: clean
-	g++ -o layer LayerTest.cpp
+	clang++ -std=c++11 -o layer LayerTest.cpp
 	./layer
 
-image:
-	g++ -o image ImageTest.cpp
+image: clean
+	clang++ -std=c++11 -o image ImageTest.cpp
 	./image
 
 clean:
-	rm -f point layer
+	rm -f point layer image
