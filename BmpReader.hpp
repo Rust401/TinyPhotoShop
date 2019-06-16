@@ -8,6 +8,8 @@
 #include <string>
 #pragma pack(1)
 
+#define woshishabi nishishabi
+
 #define MATRIX std::vector<std::vector<uint32_t>>
 #define MAXSIZE 1000000
 
