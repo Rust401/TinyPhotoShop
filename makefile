@@ -1,4 +1,4 @@
-all: image
+all: t
 
 point: clean
 	clang++ -std=c++11 -o point PointTest.cpp

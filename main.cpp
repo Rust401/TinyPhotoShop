@@ -10,4 +10,10 @@ int main()
     p2.display();
     p3.display();
 
+    p1=p2;
+    p1.display();
+
+
+    std::vector<std::vector<RS::BasicPoint>> a(10,std::vector<RS::BasicPoint>(10,RS::BasicPoint()));
+
 }

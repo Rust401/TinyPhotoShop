@@ -41,7 +41,7 @@ int main()
     }
     */
     i1.layerMerge(1,2);
-    i1.layerMerge(3,5);
+    i1.layerMerge(4,5);
 
 
     i1.displayLayerInfo();

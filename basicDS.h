@@ -1,7 +1,14 @@
 #ifndef BASIC_DS_H
 #define BASIC_DS_H
 
-#include <bits/stdc++.h>
+#include <iostream>
+#include <stdint.h>
+#include <stdlib.h>
+#include <vector>
+#include <string>
+#include <memory>
+
+#define pointMatrix std::vector<std::vector<BasicPoint>>
 
 namespace RS
 {
@@ -29,9 +36,16 @@ public:
 
     BasicPoint& operator=(const BasicPoint& p);
 };
+
+class BasicLayer
+{
+protected:
+    pointMatrix datamatrix;
+    bool isValid;
+};
+
+
 }
-
-
 
 
 #endif //BASIC_DS_H
