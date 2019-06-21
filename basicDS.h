@@ -93,11 +93,7 @@ public:
         validLayer=0;
         totalLayer=0;
         current=0;
-        layers.push_back(aLayer);
-        if(nameToIndex.insert({aLayer.getLayerName(),currentIndex}).second==true)
-            ++currentIndex;
-        totalLayer=currentIndex;
-        validLayer+=(aLayer.isValid())?1:0;
+        insert(aLayer);
     }
 
     BasicImage(const uint16_t width,const uint16_t length,
@@ -107,15 +103,11 @@ public:
         totalLayer=0;
         current=0;
         RS::BasicLayer aLayer(width,length);
-        layers.push_back(aLayer);
-        if(nameToIndex.insert({aLayer.getLayerName(),currentIndex}).second==true)
-            ++currentIndex;
-        totalLayer=currentIndex;
-        validLayer+=(aLayer.isValid())?1:0;
+        insert(aLayer);
     }
     ~BasicImage(){}
 
-    //TO DO
+    
     virtual void reInit(const uint16_t width=0,const uint16_t length=0);
     virtual void display() const;
 
@@ -124,11 +116,13 @@ public:
     virtual RS::BasicLayer& getLayer(const uint16_t index);
     virtual RS::BasicLayer& getCurrentLayer();
 
-
     virtual bool insert(const RS::BasicLayer& aLayer);
-    virtual bool insert(std::string name,dataBuffer& buffer);
-    virtual bool remove(uint16_t index);
-    virtual bool remove(std::string name);
+    virtual bool insert(std::string name,dataBuffer& buffer){/* TODO */}
+
+    
+    virtual bool remove(const uint16_t index);
+    virtual bool remove(const std::string& name);
+    //TODO//
     virtual bool duplicate(uint16_t index);
     virtual bool duplicate(std::string name);
     virtual bool swap(uint16_t index1,uint16_t index2);

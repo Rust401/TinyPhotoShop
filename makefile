@@ -13,7 +13,7 @@ image: clean
 	./image
 
 t: clean
-	clang++ -std=c++11 -o tt main.cpp basicDS.cpp
+	clang++ -std=c++11 -o tt main.cpp basicDS.cpp utils.cpp
 	./tt
 
 clean:

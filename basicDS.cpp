@@ -1,4 +1,5 @@
 #include "basicDS.h"
+#include "utils.h"
 using namespace RS;
 
 //----------------------------------
@@ -94,3 +95,44 @@ bool RS::BasicImage::insert(const RS::BasicLayer& aLayer){
     }
     return false;
 }
+
+const std::string& RS::BasicImage::getImageName() const {
+    return this->name;
+}
+
+RS::BasicLayer& RS::BasicImage::getLayer(const uint16_t index){
+    if(index>=layers.size()||index<0){
+        err("Index error.\n");
+    }
+    return layers[index];
+}
+
+RS::BasicLayer& RS::BasicImage::getLayer(const std::string& name){
+    if(!nameToIndex.count(name)){
+        err("Index error\n");
+    }
+    uint16_t index=nameToIndex[name];
+    return RS::BasicImage::getLayer(index);
+}
+
+RS::BasicLayer& RS::BasicImage::getCurrentLayer(){
+    return RS::BasicImage::getLayer(current);
+}
+
+bool RS::BasicImage::remove(const uint16_t index){
+    if(index>=layers.size()||index<0){
+        err("Index error.\n");
+        return false;
+    }
+    layers.erase(layers.begin()+index);
+    return true;
+}
+
+bool RS::BasicImage::remove(const std::string& name){
+    if(!nameToIndex.count(name)){
+        err("Index error\n");
+    }
+    uint16_t index=nameToIndex[name];
+    RS::BasicImage::remove(index);
+}
+
