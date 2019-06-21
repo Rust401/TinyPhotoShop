@@ -10,6 +10,7 @@
 #include <unordered_map>
 
 #define pointMatrix std::vector<std::vector<RS::BasicPoint>>
+#define dataBuffer std::vector<std::vector<uint32_t>>
 
 namespace RS
 {
@@ -115,23 +116,26 @@ public:
     ~BasicImage(){}
 
     //TO DO
-    virtual void reInit();
-    virtual void reInit(const uint16_t width,const uint16_t length);
+    virtual void reInit(const uint16_t width=0,const uint16_t length=0);
     virtual void display() const;
 
     virtual const std::string& getImageName() const;
     virtual RS::BasicLayer& getLayer(const std::string& name);
     virtual RS::BasicLayer& getLayer(const uint16_t index);
-    virtual uint16_t getCurrentLayer() const {return current;}
+    virtual RS::BasicLayer& getCurrentLayer();
 
 
     virtual bool insert(const RS::BasicLayer& aLayer);
+    virtual bool insert(std::string name,dataBuffer& buffer);
     virtual bool remove(uint16_t index);
     virtual bool remove(std::string name);
     virtual bool duplicate(uint16_t index);
     virtual bool duplicate(std::string name);
     virtual bool swap(uint16_t index1,uint16_t index2);
     virtual bool swap(std::string name1,std::string name2);
+
+    virtual bool updateLayer(std::string name,dataBuffer& buffer);
+    virtual bool updateLayer(uint16_t index,dataBuffer& buffer);
     //TO DO
 
 

@@ -1,5 +1,6 @@
 #include "basicDS.h"
 using namespace RS;
+
 //----------------------------------
 //--------BasicPoint----------------
 //----------------------------------
@@ -23,8 +24,6 @@ BasicPoint& RS::BasicPoint::operator=(const BasicPoint& p){
     alpha=p.alpha;
     return *this;
 }
-
-
 
 //----------------------------------
 //--------BasicLayer----------------
@@ -67,3 +66,31 @@ RS::BasicLayer& RS::BasicLayer::operator=(const BasicLayer& l){
 //----------------------------------
 //--------BasicImage----------------
 //----------------------------------
+
+void RS::BasicImage::reInit(const uint16_t width=0,const uint16_t length=0){
+    nameToIndex.clear();
+    RS::BasicLayer newLayer(width,length);
+    insert(newLayer);    
+}
+
+void RS::BasicImage::display() const{
+    printf("Image:      %p\n",this);
+    printf("Name:       %s\n",name.c_str());
+    printf("ValidLayer: %hhu\n",validLayer);
+    printf("TotalLayer: %hhu\n",totalLayer);
+    printf("Current:    %hhu\n",current);
+    std::cout<<std::endl;
+    for(auto dude:layers){
+        dude.display();
+    }
+}
+
+bool RS::BasicImage::insert(const RS::BasicLayer& aLayer){
+    layers.push_back(aLayer);
+    if(nameToIndex.insert({aLayer.getLayerName(),totalLayer}).second==true){
+        ++totalLayer;
+        if(aLayer.isValid())++validLayer;
+        return true;
+    }
+    return false;
+}
