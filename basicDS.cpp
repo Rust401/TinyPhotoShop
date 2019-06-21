@@ -83,6 +83,7 @@ void RS::BasicImage::display() const{
     std::cout<<std::endl;
     for(auto dude:layers){
         dude.display();
+        std::cout<<std::endl;
     }
 }
 

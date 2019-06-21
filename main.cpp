@@ -36,6 +36,7 @@ int main()
     img.displayHash();
     img.swap("doubi 2","doubi 3");
     img.displayHash();
+    img.display();
     
 
 }
