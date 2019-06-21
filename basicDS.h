@@ -7,8 +7,9 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <unordered_map>
 
-#define pointMatrix std::vector<std::vector<BasicPoint>>
+#define pointMatrix std::vector<std::vector<RS::BasicPoint>>
 
 namespace RS
 {
@@ -24,10 +25,10 @@ public:
     virtual void reInit();
     virtual void display();
     
-    virtual uint8_t getRed() const{return red;}
-    virtual uint8_t getGreen() const{return green;}
-    virtual uint8_t getBlue() const{return blue;}
-    virtual uint8_t getAlpha() const{return alpha;}
+    virtual uint8_t getRed() const{return (uint16_t)red;}
+    virtual uint8_t getGreen() const{return (uint16_t)green;}
+    virtual uint8_t getBlue() const{return (uint16_t)blue;}
+    virtual uint8_t getAlpha() const{return (uint16_t)alpha;}
 
     virtual void setRed(const uint8_t red){this->red=red;}
     virtual void setGreen(const uint8_t green){this->green=green;}
@@ -41,10 +42,101 @@ class BasicLayer
 {
 protected:
     pointMatrix datamatrix;
-    bool isValid;
+    std::string name;
+    uint16_t layerNumber;
+    bool Valid;
+public:
+    BasicLayer(){reInit();}
+    BasicLayer(const int16_t width,const int16_t length){reInit(width,length);}
+    BasicLayer(const pointMatrix& datamatrix,const std::string name,
+        const uint16_t layerNumber,const bool Valid):datamatrix(datamatrix),
+        name(name),layerNumber(layerNumber),Valid(Valid){}
+    virtual ~BasicLayer(){}
+    virtual void reInit();
+    virtual void reInit(const int16_t width,const int16_t length);
+    virtual void display();
+
+    virtual const pointMatrix& getDataMatrix() const {return datamatrix;}
+    virtual pointMatrix& getDataMatrix() {return datamatrix;}
+    virtual const std::string& getLayerName() const {return name;}
+    virtual uint16_t getLayerNumber() const {return layerNumber;}
+    virtual bool isValid() const {return Valid;}
+
+    virtual void setDataMatrix(const pointMatrix& matrix){datamatrix=matrix;}
+    virtual void setDataMatrix(const std::vector<std::vector<uint32_t>>& buffer){
+        //TO DO
+    }
+    virtual void setLayerName(const std::string& name){this->name=name;}
+    virtual void setLayerNumber(const uint16_t number){layerNumber=number;}
+    virtual void setValid(){Valid=true;}
+    virtual void setInvalid(){Valid=false;}
+
+    BasicLayer& operator=(const BasicLayer& layer);
 };
 
+class BasicImage
+{
+protected:
+    std::vector<RS::BasicLayer> layers;
+    std::string name;
+    std::unordered_map<std::string,uint16_t> nameToIndex;
+    uint16_t validLayer;
+    uint16_t totalLayer;
+    uint16_t current;
+public:
+    BasicImage(){}
 
+    BasicImage(const BasicLayer& aLayer,const std::string& name="default"):
+        name(name){
+        uint16_t currentIndex=0;
+        validLayer=0;
+        totalLayer=0;
+        current=0;
+        layers.push_back(aLayer);
+        if(nameToIndex.insert({aLayer.getLayerName(),currentIndex}).second==true)
+            ++currentIndex;
+        totalLayer=currentIndex;
+        validLayer+=(aLayer.isValid())?1:0;
+    }
+
+    BasicImage(const uint16_t width,const uint16_t length,
+        const std::string& name="default"){
+        uint16_t currentIndex=0;
+        validLayer=0;
+        totalLayer=0;
+        current=0;
+        RS::BasicLayer aLayer(width,length);
+        layers.push_back(aLayer);
+        if(nameToIndex.insert({aLayer.getLayerName(),currentIndex}).second==true)
+            ++currentIndex;
+        totalLayer=currentIndex;
+        validLayer+=(aLayer.isValid())?1:0;
+    }
+    ~BasicImage(){}
+
+    //TO DO
+    virtual void reInit();
+    virtual void reInit(const uint16_t width,const uint16_t length);
+    virtual void display() const;
+
+    virtual const std::string& getImageName() const;
+    virtual RS::BasicLayer& getLayer(const std::string& name);
+    virtual RS::BasicLayer& getLayer(const uint16_t index);
+    virtual uint16_t getCurrentLayer() const {return current;}
+
+
+    virtual bool insert(const RS::BasicLayer& aLayer);
+    virtual bool remove(uint16_t index);
+    virtual bool remove(std::string name);
+    virtual bool duplicate(uint16_t index);
+    virtual bool duplicate(std::string name);
+    virtual bool swap(uint16_t index1,uint16_t index2);
+    virtual bool swap(std::string name1,std::string name2);
+    //TO DO
+
+
+    
+};
 }
 
 
