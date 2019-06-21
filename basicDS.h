@@ -84,6 +84,7 @@ protected:
     uint16_t validLayer;
     uint16_t totalLayer;
     uint16_t current;
+    bool indexOK(const uint16_t index){return index>=0&&index<layers.size();}
 public:
     BasicImage(){}
 
@@ -118,24 +119,15 @@ public:
 
     virtual bool insert(const RS::BasicLayer& aLayer);
     virtual bool insert(std::string name,dataBuffer& buffer){/* TODO */}
-
-    
     virtual bool remove(const uint16_t index);
     virtual bool remove(const std::string& name);
-    //TODO//
-    virtual bool duplicate(uint16_t index);
-    virtual bool duplicate(std::string name);
-    virtual bool swap(uint16_t index1,uint16_t index2);
-    virtual bool swap(std::string name1,std::string name2);
-
-    virtual bool updateLayer(std::string name,dataBuffer& buffer);
-    virtual bool updateLayer(uint16_t index,dataBuffer& buffer);
-    //TO DO
-
-
-    
+    virtual bool duplicate(const uint16_t index);
+    virtual bool duplicate(const std::string& name);
+    virtual bool swap(const uint16_t index1,const uint16_t index2);
+    virtual bool swap(const std::string& name1,const std::string& name2);
+    virtual bool updateLayer(const std::string& name,const dataBuffer& buffer){/* TODO */}
+    virtual bool updateLayer(const uint16_t index,const dataBuffer& buffer){/* TODO */}
 };
 }
-
 
 #endif //BASIC_DS_H

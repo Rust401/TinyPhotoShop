@@ -68,7 +68,7 @@ RS::BasicLayer& RS::BasicLayer::operator=(const BasicLayer& l){
 //--------BasicImage----------------
 //----------------------------------
 
-void RS::BasicImage::reInit(const uint16_t width=0,const uint16_t length=0){
+void RS::BasicImage::reInit(const uint16_t width,const uint16_t length){
     nameToIndex.clear();
     RS::BasicLayer newLayer(width,length);
     insert(newLayer);    
@@ -77,9 +77,9 @@ void RS::BasicImage::reInit(const uint16_t width=0,const uint16_t length=0){
 void RS::BasicImage::display() const{
     printf("Image:      %p\n",this);
     printf("Name:       %s\n",name.c_str());
-    printf("ValidLayer: %hhu\n",validLayer);
-    printf("TotalLayer: %hhu\n",totalLayer);
-    printf("Current:    %hhu\n",current);
+    printf("ValidLayer: %hu\n",validLayer);
+    printf("TotalLayer: %hu\n",totalLayer);
+    printf("Current:    %hu\n",current);
     std::cout<<std::endl;
     for(auto dude:layers){
         dude.display();
@@ -109,7 +109,7 @@ RS::BasicLayer& RS::BasicImage::getLayer(const uint16_t index){
 
 RS::BasicLayer& RS::BasicImage::getLayer(const std::string& name){
     if(!nameToIndex.count(name)){
-        err("Index error\n");
+        err("No such layer\n");
     }
     uint16_t index=nameToIndex[name];
     return RS::BasicImage::getLayer(index);
@@ -124,15 +124,63 @@ bool RS::BasicImage::remove(const uint16_t index){
         err("Index error.\n");
         return false;
     }
+    //remove the name-index pair from the hash_map
+    for(auto i=nameToIndex.begin();i!=nameToIndex.end();++i){
+        if(i->second==index)nameToIndex.erase(i->first);
+    }
     layers.erase(layers.begin()+index);
     return true;
 }
 
 bool RS::BasicImage::remove(const std::string& name){
     if(!nameToIndex.count(name)){
-        err("Index error\n");
+        err("No such layer\n");
+        return false;
     }
     uint16_t index=nameToIndex[name];
     RS::BasicImage::remove(index);
+    return true;
 }
+
+bool RS::BasicImage::duplicate(const uint16_t index){
+    if(index>=layers.size()||index<0){
+        err("Index error.\n");
+        return false;
+    }
+    RS::BasicLayer newDude=layers[index];
+    newDude.setLayerName(newDude.getLayerName()+"_dup");
+    insert(newDude);
+    return true;
+}
+
+bool RS::BasicImage::duplicate(const std::string& name){
+    if(!nameToIndex.count(name)){
+        err("No such layer\n");
+        return false;
+    }
+    uint16_t index=nameToIndex[name];
+    return RS::BasicImage::duplicate(index);
+}
+
+bool RS::BasicImage::swap(const uint16_t index1,const uint16_t index2){
+    if(indexOK(index1)&&indexOK(index2)){
+        std::swap(layers[index1],layers[index2]);
+        return true;
+    }else{
+        err("Index error.\n");
+        return false;
+    }
+}
+
+bool RS::BasicImage::swap(const std::string& name1,const std::string& name2){
+    if(!nameToIndex.count(name1)||!nameToIndex.count(name2)){
+        err("Index errror.\n");
+        return false;
+    }
+    return RS::BasicImage::swap(nameToIndex[name1],nameToIndex[name2]);
+}
+
+
+
+
 
