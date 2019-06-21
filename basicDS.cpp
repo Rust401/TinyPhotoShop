@@ -86,9 +86,15 @@ void RS::BasicImage::display() const{
     }
 }
 
+void RS::BasicImage::displayHash() const{
+    for(auto it=nameToIndex.begin();it!=nameToIndex.end();++it){
+        std::cout<<it->first<<" "<<it->second<<std::endl;
+    }
+}
+
 bool RS::BasicImage::insert(const RS::BasicLayer& aLayer){
-    layers.push_back(aLayer);
     if(nameToIndex.insert({aLayer.getLayerName(),totalLayer}).second==true){
+        layers.push_back(aLayer);
         ++totalLayer;
         if(aLayer.isValid())++validLayer;
         return true;
@@ -164,6 +170,11 @@ bool RS::BasicImage::duplicate(const std::string& name){
 
 bool RS::BasicImage::swap(const uint16_t index1,const uint16_t index2){
     if(indexOK(index1)&&indexOK(index2)){
+        //swap the name-index hash_map uing this stupid way
+        for(auto i=nameToIndex.begin();i!=nameToIndex.end();++i){
+            if(i->second==index1){i->second=index2;continue;}
+            if(i->second==index2){i->second=index1;continue;}
+        }
         std::swap(layers[index1],layers[index2]);
         return true;
     }else{

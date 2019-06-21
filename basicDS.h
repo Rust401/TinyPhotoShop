@@ -111,6 +111,7 @@ public:
     
     virtual void reInit(const uint16_t width=0,const uint16_t length=0);
     virtual void display() const;
+    virtual void displayHash() const;
 
     virtual const std::string& getImageName() const;
     virtual RS::BasicLayer& getLayer(const std::string& name);
@@ -118,15 +119,15 @@ public:
     virtual RS::BasicLayer& getCurrentLayer();
 
     virtual bool insert(const RS::BasicLayer& aLayer);
-    virtual bool insert(std::string name,dataBuffer& buffer){/* TODO */}
+    virtual bool insert(std::string name,dataBuffer& buffer){return false;/* TODO */}
     virtual bool remove(const uint16_t index);
     virtual bool remove(const std::string& name);
     virtual bool duplicate(const uint16_t index);
     virtual bool duplicate(const std::string& name);
     virtual bool swap(const uint16_t index1,const uint16_t index2);
     virtual bool swap(const std::string& name1,const std::string& name2);
-    virtual bool updateLayer(const std::string& name,const dataBuffer& buffer){/* TODO */}
-    virtual bool updateLayer(const uint16_t index,const dataBuffer& buffer){/* TODO */}
+    virtual bool updateLayer(const std::string& name,const dataBuffer& buffer){return false;/* TODO */}
+    virtual bool updateLayer(const uint16_t index,const dataBuffer& buffer){return false;/* TODO */}
 };
 }
 
