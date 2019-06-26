@@ -19,10 +19,19 @@ int main()
     std::cout<<&b<<std::endl; */
 
 
-    dataBuffer haha={{0x11111111,0x22222222,0xffffffff},{0x33333333,0x44444444,0x3f3f3f3f}};
-    RS::BasicLayer keyi(haha);
+    dataBuffer haha(1024,std::vector<uint32_t>(1024,0xffffffff));
+    dataBuffer baba={{0x11111111,0x22222222,0xffffffff},{0x33333333,0x44444444,0x3f3f3f3f},
+        {0x11111111,0x22222222,0xffffffff},{0x33333333,0x44444444,0x3f3f3f3f}};
+    RS::BasicImage dude(haha);
+    dude.display();
+    /* RS::BasicLayer keyi;
     keyi.display();
     keyi.displayData();
+    keyi.setDataMatrix(haha);
+    keyi.display();
+    keyi.setDataMatrix(baba);
+    keyi.display();
+    keyi.displayData();  */
     
 
     /* uint32_t gege=0x3f3f3f3f;
@@ -36,20 +45,21 @@ int main()
 
 
 
-/*     RS::BasicLayer l1(100,100);
+    /* RS::BasicLayer l1(1024,1024);
     l1.setLayerName("doubi 1");
-    RS::BasicLayer l2(1200,10);
+    RS::BasicLayer l2(2048,2048);
     l2.setLayerName("doubi 2");
-    RS::BasicLayer l3(5,5);
+    RS::BasicLayer l3(4096,4096);
     l3.setLayerName("doubi 3");
-    RS::BasicLayer l4(7,120);
+    RS::BasicLayer l4(8192,8192);
     l4.setLayerName("doubi 4");
     l4.setInvalid();
     RS::BasicImage img;
     img.insert(l1);
     img.insert(l2);
     img.insert(l3);
-    img.insert(l4); */
+    img.insert(l4); 
+    img.display(); */
 
 
     

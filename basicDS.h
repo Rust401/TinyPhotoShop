@@ -59,6 +59,7 @@ public:
     virtual ~BasicLayer(){}
     virtual void reInit();
     virtual void reInit(const int16_t width,const int16_t length);
+    virtual void reInit(const dataBuffer& datas);
     virtual void display();
     virtual void displayData();
 
@@ -69,9 +70,7 @@ public:
     virtual bool isValid() const {return Valid;}
 
     virtual void setDataMatrix(const pointMatrix& matrix){datamatrix=matrix;}
-    virtual void setDataMatrix(const std::vector<std::vector<uint32_t>>& buffer){
-        //TO DO
-    }
+    virtual void setDataMatrix(const std::vector<std::vector<uint32_t>>& buffer);
     virtual void setLayerName(const std::string& name){this->name=name;}
     virtual void setLayerNumber(const uint16_t number){layerNumber=number;}
     virtual void setValid(){Valid=true;}
@@ -109,6 +108,15 @@ public:
         totalLayer=0;
         current=0;
         RS::BasicLayer aLayer(width,length);
+        insert(aLayer);
+    }
+    BasicImage(const dataBuffer& data){
+        const std::string& name="default";
+        uint16_t currentIndex=0;
+        validLayer=0;
+        totalLayer=0;
+        current=0;
+        RS::BasicLayer aLayer(data);
         insert(aLayer);
     }
     ~BasicImage(){}

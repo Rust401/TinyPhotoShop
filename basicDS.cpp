@@ -43,17 +43,7 @@ BasicPoint& RS::BasicPoint::operator=(const BasicPoint& p){
 //--------BasicLayer----------------
 //----------------------------------
 RS::BasicLayer::BasicLayer(const dataBuffer& data){
-    if(data.size()==0)reInit();
-    if(data[0].size()==0)reInit();
-    uint16_t width=data.size();
-    uint16_t length=data[0].size();
-    reInit(width,length);
-    //use the buffer we get to init our layer
-    for(int i=0;i<width;++i){
-        for(int j=0;j<length;++j){
-            datamatrix[i][j].reInit(data[i][j]);
-        }
-    }
+    reInit(data);
 }
 
 void RS::BasicLayer::reInit(){
@@ -72,6 +62,20 @@ void RS::BasicLayer::reInit(const int16_t width,const int16_t length){
     Valid=true;  
 }
 
+void RS::BasicLayer::reInit(const dataBuffer& data){
+    if(data.size()==0)reInit();
+    if(data[0].size()==0)reInit();
+    uint16_t width=data.size();
+    uint16_t length=data[0].size();
+    reInit(width,length);
+    //use the buffer we get to init our layer
+    for(int i=0;i<width;++i){
+        for(int j=0;j<length;++j){
+            datamatrix[i][j].reInit(data[i][j]);
+        }
+    }
+}
+
 void RS::BasicLayer::display(){
     printf("DataMatrix:  %p\n",&datamatrix);
     printf("Name:        %s\n",name.c_str());
@@ -82,8 +86,8 @@ void RS::BasicLayer::display(){
 }
 
 void RS::BasicLayer::displayData(){
-    if(datamatrix.size()==0)std::cout<<"null"<<std::endl;
-    if(datamatrix[0].size()==0)std::cout<<"null"<<std::endl;
+    if(datamatrix.size()==0){std::cout<<"null"<<std::endl;return;}
+    if(datamatrix[0].size()==0){std::cout<<"null"<<std::endl;return;}
     for(int i=0;i<datamatrix.size();++i){
         for(int j=0;j<datamatrix[0].size();++j){
             RS::BasicPoint tmp=datamatrix[i][j];
@@ -92,6 +96,24 @@ void RS::BasicLayer::displayData(){
         }
         std::cout<<std::endl;
     }
+}
+
+void RS::BasicLayer::setDataMatrix(const dataBuffer& data){
+    uint16_t newWidth,newLength;
+    if(data.size()==0||data[0].size()==0){
+        newWidth=0;
+        newLength=0;
+    }else{
+        newWidth=data.size();
+        newLength=data[0].size();
+    }
+    pointMatrix newDataMatrix(newWidth,std::vector<RS::BasicPoint>(newLength));
+    for(int i=0;i<newWidth;++i){
+        for(int j=0;j<newLength;++j){
+            newDataMatrix[i][j].reInit(data[i][j]);
+        }
+    }
+    datamatrix=newDataMatrix;
 }
 
 RS::BasicLayer& RS::BasicLayer::operator=(const BasicLayer& l){
