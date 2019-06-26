@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <memory.h>
 #include <unordered_map>
 
 #define pointMatrix std::vector<std::vector<RS::BasicPoint>>
@@ -20,10 +21,12 @@ protected:
     uint8_t red,green,blue,alpha;
 public:
     BasicPoint(){red=0;green=0;blue=0;alpha=0;}
-    BasicPoint(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha=0):
-        red(red),green(green),blue(blue),alpha(alpha){}
+    BasicPoint(const uint8_t red, const uint8_t green, const uint8_t blue,
+        const uint8_t alpha=0):red(red),green(green),blue(blue),alpha(alpha){}
+    BasicPoint(const uint32_t data);//use a uint32 to initial
     virtual ~BasicPoint(){};
     virtual void reInit();
+    virtual void reInit(const uint32_t data);
     virtual void display();
     
     virtual uint8_t getRed() const{return (uint16_t)red;}
@@ -44,7 +47,7 @@ class BasicLayer
 protected:
     pointMatrix datamatrix;
     std::string name;
-    uint16_t layerNumber;
+    uint16_t layerNumber;//this layerNumber seem to be useless, change it to static?
     bool Valid;
 public:
     BasicLayer(){reInit();}
@@ -52,10 +55,12 @@ public:
     BasicLayer(const pointMatrix& datamatrix,const std::string name,
         const uint16_t layerNumber,const bool Valid):datamatrix(datamatrix),
         name(name),layerNumber(layerNumber),Valid(Valid){}
+    BasicLayer(const dataBuffer& datas);
     virtual ~BasicLayer(){}
     virtual void reInit();
     virtual void reInit(const int16_t width,const int16_t length);
     virtual void display();
+    virtual void displayData();
 
     virtual const pointMatrix& getDataMatrix() const {return datamatrix;}
     virtual pointMatrix& getDataMatrix() {return datamatrix;}

@@ -5,11 +5,23 @@ using namespace RS;
 //----------------------------------
 //--------BasicPoint----------------
 //----------------------------------
+RS::BasicPoint::BasicPoint(const uint32_t data)
+{
+    //Don't use the memset to initial
+    //this class have virtual function!!
+    reInit(data);
+}
+
 void RS::BasicPoint::reInit(){
     red=0;
     green=0;
     blue=0;
     alpha=0;
+}
+
+void RS::BasicPoint::reInit(const uint32_t data){
+    uint8_t* p=(uint8_t*)&data;
+    red=*p;green=*(p+1);blue=*(p+2);alpha=*(p+3);
 }
 
 void RS::BasicPoint::display(){
@@ -26,9 +38,23 @@ BasicPoint& RS::BasicPoint::operator=(const BasicPoint& p){
     return *this;
 }
 
+
 //----------------------------------
 //--------BasicLayer----------------
 //----------------------------------
+RS::BasicLayer::BasicLayer(const dataBuffer& data){
+    if(data.size()==0)reInit();
+    if(data[0].size()==0)reInit();
+    uint16_t width=data.size();
+    uint16_t length=data[0].size();
+    reInit(width,length);
+    //use the buffer we get to init our layer
+    for(int i=0;i<width;++i){
+        for(int j=0;j<length;++j){
+            datamatrix[i][j].reInit(data[i][j]);
+        }
+    }
+}
 
 void RS::BasicLayer::reInit(){
     pointMatrix newMatrix(0,std::vector<RS::BasicPoint>(0));
@@ -53,6 +79,19 @@ void RS::BasicLayer::display(){
     printf("Valid:       %d\n",(int16_t)Valid);
     printf("Width:       %zu\n",datamatrix.size());
     printf("Length:      %zu\n",datamatrix.size()==0?0:datamatrix[0].size());
+}
+
+void RS::BasicLayer::displayData(){
+    if(datamatrix.size()==0)std::cout<<"null"<<std::endl;
+    if(datamatrix[0].size()==0)std::cout<<"null"<<std::endl;
+    for(int i=0;i<datamatrix.size();++i){
+        for(int j=0;j<datamatrix[0].size();++j){
+            RS::BasicPoint tmp=datamatrix[i][j];
+            printf("%x %x %x %x   ",tmp.getRed(),tmp.getGreen(),tmp.getBlue(),
+                tmp.getAlpha());
+        }
+        std::cout<<std::endl;
+    }
 }
 
 RS::BasicLayer& RS::BasicLayer::operator=(const BasicLayer& l){
