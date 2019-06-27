@@ -1,9 +1,12 @@
 #ifndef _PNG_
 #define _PNG_
 #include <iostream>
+#include <algorithm>
+#include<zlib.h>
 #include<stdint.h>
 #include<iomanip>
 #include<vector>
+#include<math.h>
 #pragma pack(1)
 
 #define MATRIX std::vector<std::vector<uint32_t>>
@@ -20,14 +23,29 @@ struct BlockInfo{
 class PNG {
 public:
 	std::vector<BlockInfo*> V;
+	uint32_t height;
+	uint32_t width;
+	uint8_t depth;
+	uint8_t colorType;
+	uint8_t compression;
+	uint8_t filter;
+	uint8_t scan;
 
 	PNG();
 	~PNG();
 	char* PNGRead(const char *Filename);
 	void PrintBlocks(BlockInfo* B);
 	void PNGWrite(int size,char* buf,const char *Filename); 
-
-//	MATRIX* PNGEncrypt(uint8_t* PtData);
-//	void PNGDecrypt(char** buffer,MATRIX* layer);
+	void IHDRread();
+	void PrintImageInfo();
+	unsigned char* BufScan(int len,unsigned char* bufin, int type);
+	MATRIX* PNGDecrypt();
+//	void PNGEncrypt(char** buffer,MATRIX* layer);
+private:
+	void FilterNone(unsigned char* bufout,unsigned char*  line,int BytesPerPixel,int BytesPerRow,int offset);
+	void FilterUp(unsigned char* bufout, unsigned char*  line, int BytesPerPixel, int BytesPerRow, int offset);
+	void FilterSub(unsigned char* bufout, unsigned char*  line, int BytesPerPixel, int BytesPerRow, int offset);
+	void FilterAvg(unsigned char* bufout, unsigned char*  line, int BytesPerPixel, int BytesPerRow, int offset);
+	void FilterPaeth(unsigned char* bufout, unsigned char*  line, int BytesPerPixel, int BytesPerRow, int offset);
 };
 #endif // !_PNG_
