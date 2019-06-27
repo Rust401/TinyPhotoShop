@@ -164,6 +164,13 @@ bool RS::BasicImage::insert(const RS::BasicLayer& aLayer){
     return false;
 }
 
+bool RS::BasicImage::insert(const std::string& name,const dataBuffer& buffer){
+    RS::BasicLayer newLayer(buffer);
+    newLayer.setLayerName(name);
+    if(insert(newLayer))return true;
+    return false;
+}
+
 const std::string& RS::BasicImage::getImageName() const {
     return this->name;
 }
@@ -251,6 +258,31 @@ bool RS::BasicImage::swap(const std::string& name1,const std::string& name2){
         return false;
     }
     return RS::BasicImage::swap(nameToIndex[name1],nameToIndex[name2]);
+}
+
+bool RS::BasicImage::updateLayer(const uint16_t index,const dataBuffer& buffer){
+    if(index>=layers.size()||index<0){
+        err("Index error.\n");
+        return false;
+    }
+    RS::BasicLayer newLayer(buffer);
+    std::string tmpName=layers[index].getLayerName();
+    bool tmpValid=layers[index].isValid();
+    newLayer.setLayerName(tmpName);
+    if(tmpValid)newLayer.setValid();
+    else newLayer.setInvalid();
+    layers[index]=newLayer;
+    return true;
+}
+
+bool RS::BasicImage::updateLayer(const std::string& name,const dataBuffer& buffer){
+    if(!nameToIndex.count(name)){
+        err("No such layer\n");
+        return false;
+    }
+    uint16_t index=nameToIndex[name];
+    if(updateLayer(index,buffer))return true;
+    return false;
 }
 
 

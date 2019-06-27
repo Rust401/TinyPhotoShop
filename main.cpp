@@ -22,8 +22,13 @@ int main()
     dataBuffer haha(1024,std::vector<uint32_t>(1024,0xffffffff));
     dataBuffer baba={{0x11111111,0x22222222,0xffffffff},{0x33333333,0x44444444,0x3f3f3f3f},
         {0x11111111,0x22222222,0xffffffff},{0x33333333,0x44444444,0x3f3f3f3f}};
-    RS::BasicImage dude(haha);
+    dataBuffer caca(2048,std::vector<uint32_t>(2048,0x3f3f3f3f));
+    /* RS::BasicImage dude(haha);
     dude.display();
+    dude.insert("ruozhi",haha);
+    dude.updateLayer(0,baba);
+    dude.display();
+    dude.displayHash(); */
     /* RS::BasicLayer keyi;
     keyi.display();
     keyi.displayData();
@@ -45,21 +50,28 @@ int main()
 
 
 
-    /* RS::BasicLayer l1(1024,1024);
+    RS::BasicLayer l1(1024,1024);
     l1.setLayerName("doubi 1");
     RS::BasicLayer l2(2048,2048);
     l2.setLayerName("doubi 2");
-    RS::BasicLayer l3(4096,4096);
+    RS::BasicLayer l3(40,40);
     l3.setLayerName("doubi 3");
-    RS::BasicLayer l4(8192,8192);
+    RS::BasicLayer l4(81,81);
     l4.setLayerName("doubi 4");
     l4.setInvalid();
     RS::BasicImage img;
     img.insert(l1);
     img.insert(l2);
     img.insert(l3);
-    img.insert(l4); 
-    img.display(); */
+    img.insert(l4);
+    img.updateLayer("doubi 4",caca);
+    img.duplicate("doubi 4");
+    img.duplicate("doubi 3");
+    img.swap("doubi 1","doubi 2");
+    img.displayHash();
+    
+    img.display();
+    
 
 
     
