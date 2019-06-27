@@ -9,9 +9,11 @@
 #include <memory>
 #include <memory.h>
 #include <unordered_map>
+#include <math.h>
 
 #define pointMatrix std::vector<std::vector<RS::BasicPoint>>
 #define dataBuffer std::vector<std::vector<uint32_t>>
+#define rowData std::vector<uint32_t>
 
 namespace RS
 {
@@ -33,6 +35,7 @@ public:
     virtual uint8_t getGreen() const{return (uint16_t)green;}
     virtual uint8_t getBlue() const{return (uint16_t)blue;}
     virtual uint8_t getAlpha() const{return (uint16_t)alpha;}
+    virtual uint32_t getUint32() const;
 
     virtual void setRed(const uint8_t red){this->red=red;}
     virtual void setGreen(const uint8_t green){this->green=green;}
@@ -75,6 +78,12 @@ public:
     virtual void setLayerNumber(const uint16_t number){layerNumber=number;}
     virtual void setValid(){Valid=true;}
     virtual void setInvalid(){Valid=false;}
+
+    virtual void rightRotate();
+    virtual void leftRotate();
+    virtual void upDownReverse();
+    virtual void leftRightReverse();
+    virtual bool taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_t columnE);
 
     BasicLayer& operator=(const BasicLayer& layer);
 };
@@ -141,6 +150,12 @@ public:
     virtual bool swap(const std::string& name1,const std::string& name2);
     virtual bool updateLayer(const std::string& name,const dataBuffer& buffer);
     virtual bool updateLayer(const uint16_t index,const dataBuffer& buffer);
+
+    virtual bool taylor(const std::string& name,const std::vector<uint16_t>& array);
+    virtual bool taylor(const uint16_t index,const std::vector<uint16_t>& array);
+
+    virtual void mergeLayer(const std::string& name1,const std::string& name2);
+    virtual void mergeLayer(const uint16_t index1,const uint16_t index2);
 };
 }
 

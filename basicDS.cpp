@@ -38,6 +38,16 @@ BasicPoint& RS::BasicPoint::operator=(const BasicPoint& p){
     return *this;
 }
 
+uint32_t RS::BasicPoint::getUint32() const{
+    uint32_t result;
+    uint8_t* p=(uint8_t*)&result;
+    *p=getRed();
+    *(p+1)=getGreen();
+    *(p+2)=getBlue();
+    *(p+3)=getAlpha();
+    return result;
+}
+
 
 //----------------------------------
 //--------BasicLayer----------------
@@ -122,6 +132,45 @@ RS::BasicLayer& RS::BasicLayer::operator=(const BasicLayer& l){
     layerNumber=l.layerNumber;
     Valid=l.Valid;
     return *this;
+}
+
+void RS::BasicLayer::rightRotate(){
+
+}
+
+void RS::BasicLayer::leftRotate(){
+
+}
+
+void RS::BasicLayer::upDownReverse(){
+
+}
+
+void RS::BasicLayer::leftRightReverse(){
+
+}
+
+bool RS::BasicLayer::taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_t columnE){
+    if(datamatrix.size()==0)return false;
+    if(datamatrix[0].size()==0)return false;
+    if(rowS<0||rowS>=datamatrix.size())return false;
+    if(columnS<0||columnS>datamatrix[0].size())return false;
+    if(rowE<0||rowE>=datamatrix.size()||rowE<=rowS)return false;
+    if(columnE<0||columnE>=datamatrix[0].size()||columnE<=columnS)return false;
+    uint16_t newWidth=rowE-rowS+1;
+    uint16_t newLength=columnE-columnS+1;
+    dataBuffer tmp(newWidth,rowData(newLength,0));
+    for(int i=rowS;i<rowE;++i){
+        for(int j=columnS;j<columnS;++j){
+            tmp[i][j]=datamatrix[i][j].getUint32();
+        }
+    }
+    std::string newName=name;
+    bool newValid=isValid();
+    reInit(tmp);
+    name=newName;
+    Valid=newValid;
+    return true;
 }
 
 
@@ -283,6 +332,31 @@ bool RS::BasicImage::updateLayer(const std::string& name,const dataBuffer& buffe
     uint16_t index=nameToIndex[name];
     if(updateLayer(index,buffer))return true;
     return false;
+}
+
+bool RS::BasicImage::taylor(const std::string& name,const std::vector<uint16_t>& array){
+    if(!nameToIndex.count(name)){
+        err("No such layer\n");
+        return false;
+    }
+    uint16_t index=nameToIndex[name];
+    if(taylor(index,array))return true;
+    return false;
+}
+bool RS::BasicImage::taylor(const uint16_t index,const std::vector<uint16_t>& array){
+    if(index>=layers.size()||index<0){
+        err("Index error.\n");
+        return false;
+    }
+    if(layers[index].taylor(array[0],array[1],array[2],array[3]))return true;
+    return false;
+}
+
+void RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2){
+
+}
+void RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2){
+    
 }
 
 

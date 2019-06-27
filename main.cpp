@@ -8,7 +8,6 @@ void foo(RS::BasicLayer& srcs){
 
 int main()
 {
-
     /* std::vector<std::vector<RS::BasicPoint>> a(1,std::vector<RS::BasicPoint>(1,RS::BasicPoint(0,0,0,0)));
     std::vector<std::vector<RS::BasicPoint>> b(1,std::vector<RS::BasicPoint>(1));
     std::cout<<"shifoer"<<std::endl;
@@ -19,10 +18,10 @@ int main()
     std::cout<<&b<<std::endl; */
 
 
-    dataBuffer haha(1024,std::vector<uint32_t>(1024,0xffffffff));
+    dataBuffer haha(1024,rowData(1024,0xffffffff));
     dataBuffer baba={{0x11111111,0x22222222,0xffffffff},{0x33333333,0x44444444,0x3f3f3f3f},
         {0x11111111,0x22222222,0xffffffff},{0x33333333,0x44444444,0x3f3f3f3f}};
-    dataBuffer caca(2048,std::vector<uint32_t>(2048,0x3f3f3f3f));
+    dataBuffer caca(2048,rowData(2048,0x3f3f3f3f));
     /* RS::BasicImage dude(haha);
     dude.display();
     dude.insert("ruozhi",haha);
@@ -48,7 +47,7 @@ int main()
     std::cout<<std::endl; */
 
 
-
+    std::vector<uint16_t> array={30,30,60,60};
 
     RS::BasicLayer l1(1024,1024);
     l1.setLayerName("doubi 1");
@@ -64,6 +63,7 @@ int main()
     img.insert(l2);
     img.insert(l3);
     img.insert(l4);
+    img.taylor("doubi 1",array);
     img.updateLayer("doubi 4",caca);
     img.duplicate("doubi 4");
     img.duplicate("doubi 3");
