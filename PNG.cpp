@@ -292,103 +292,127 @@ unsigned char* PNG::BufScan(int len,unsigned char* bufin, int type) {
 	}
 	return bufout;
 }
+
+///////////////////////////////////////////////////////////////////////////////////////
+// x 是我们操作的对象
+
+// c b
+// a x
+
+
+//不做任何操作，直接放上去
 void PNG::FilterNone(unsigned char* bufout, unsigned char*  line, int BytesPerPixel, int BytesPerRow, int offset) {
-	for (int i = 0; i < BytesPerRow; i++) {
-		bufout[offset + i] = line[i];
+	for (int i = 0; i < BytesPerRow; i++) {//对每一行循环
+		bufout[offset + i] = line[i];//按位置放上去
 	}
 }
+
+//和b作差,当x在最顶端时不做操作
 void PNG::FilterUp(unsigned char* bufout, unsigned char*  line, int BytesPerPixel, int BytesPerRow, int offset) {
-	if (offset < BytesPerRow) {
-		for (int i = 0; i < BytesPerRow; i++) {
+	if (offset < BytesPerRow) {//如果是第一行
+		for (int i = 0; i < BytesPerRow; i++) {//不做操作，按位置放上去
 			bufout[offset + i] = line[i];
 		}
 	}
-	else {
+	else {//不是第一行
 		for (int i = 0; i < BytesPerRow; i++) {
-			unsigned char tmp = bufout[offset + i - BytesPerRow];
-			unsigned char v = line[i] + tmp;
-			bufout[offset + i] = v & 0xff;
+			unsigned char tmp = bufout[offset + i - BytesPerRow];//这是b
+			unsigned char v = line[i] + tmp;//原x = 现x + b；
+			bufout[offset + i] = v & 0xff;//防止溢出
 		}
 	}
 }
+
+//和a做差，当x在最左边时不做操作
 void PNG::FilterSub(unsigned char* bufout, unsigned char*  line, int BytesPerPixel, int BytesPerRow, int offset) {
 	for (int i = 0; i < BytesPerRow; i++) {
-		if (i < BytesPerPixel) {
-			bufout[offset + i] = line[i];
+		if (i < BytesPerPixel) {//如果是第一个像素
+			bufout[offset + i] = line[i];//直接放上去
 		}
-		else {
-			unsigned char tmp = bufout[offset + i - BytesPerPixel];
-			unsigned char v = line[i] + tmp;
+		else {//不是第一个像素
+			unsigned char tmp = bufout[offset + i - BytesPerPixel];//这是a
+			unsigned char v = line[i] + tmp;// x = x' + a
 			bufout[offset + i] = v & 0xff;
 		}
 	}
 }
+
+//取 a b 的平均值，与这个平均值作差。 如果x在最左上角，不做操作，x在最顶端，只和a的1/2作差，x在最左边，只和b的1/2作差
 void PNG::FilterAvg(unsigned char* bufout, unsigned char*  line, int BytesPerPixel, int BytesPerRow, int offset) {
-	if (offset < BytesPerRow) {
+	if (offset < BytesPerRow) {//第一行
 		for (int i = 0; i < BytesPerRow; i++) {
-			if (i < BytesPerPixel) {
-				bufout[offset + i] = line[i];
+			if (i < BytesPerPixel) {//第一列
+				bufout[offset + i] = line[i];//直接放
 			}
-			else {
-				unsigned char tmp = bufout[offset + i - BytesPerPixel];
-				unsigned char v = line[i] + tmp;
+			else {//不是第一列
+				unsigned char tmp = bufout[offset + i - BytesPerPixel];//这是 a
+				unsigned char v = line[i] + (tmp>>1);//x = x’ + a
 				bufout[offset + i] = v & 0xff;
 			}
 		}
 	}
-	else {
+	else {//不是第一行
 		for (int i = 0; i < BytesPerRow; i++) {
-			if (i < BytesPerPixel) {
-				unsigned char tmp = bufout[offset + i - BytesPerRow];
-				unsigned char v = line[i] + tmp;
+			if (i < BytesPerPixel) {//第一列
+				unsigned char tmp = bufout[offset + i - BytesPerRow];//这是 b
+				unsigned char v = line[i] + (tmp>>1);//x = x‘ + b
 				bufout[offset + i] = v & 0xff;
 			}
-			else {
-				unsigned char tmpa = bufout[offset + i - BytesPerPixel];
-				unsigned char tmpb = bufout[offset + i - BytesPerRow];
+			else {//不是第一列
+				unsigned char tmpa = bufout[offset + i - BytesPerPixel];//a
+				unsigned char tmpb = bufout[offset + i - BytesPerRow];//b
 
-				unsigned char v = line[i] + ((tmpa + tmpb) >> 1);
+				unsigned char v = line[i] + ((tmpa + tmpb) >> 1);//x = x' +（a+b）/2
 				bufout[offset + i] = v & 0xff;
 			}
 		}
 	}
 }
+
+// p = a+b-c
+//pa = abs(p-a)
+//pb = abs(p-b)
+//pc = abs(p-c)
+//if(pa<=pb && pa<=pc) pr = a;
+//else if(pb<=pc) pr=b;
+//else pr = c
+// x = x-c;
 void PNG::FilterPaeth(unsigned char* bufout, unsigned char*  line, int BytesPerPixel, int BytesPerRow, int offset) {
-	if (offset < BytesPerRow) {
+	if (offset < BytesPerRow) {//第一行
 		for (int i = 0; i < BytesPerRow; i++) {
-			if (i < BytesPerPixel) {
+			if (i < BytesPerPixel) {//第一列
 				bufout[offset + i] = line[i];
 			}
-			else {
-				unsigned char tmp = bufout[offset + i - BytesPerPixel];
-				unsigned char v = line[i] + tmp;
+			else {//不是第一列
+				unsigned char tmp = bufout[offset + i - BytesPerPixel];//a
+				unsigned char v = line[i] + tmp;//x = x' + a
 				bufout[offset + i] = v & 0xff;
 			}
 		}
 	}
-	else {
+	else {//不是第一行
 		for (int i = 0; i < BytesPerRow; i++) {
-			if (i < BytesPerPixel) {
-				unsigned char tmp = bufout[offset + i - BytesPerRow];
-				unsigned char v = line[i] + tmp;
+			if (i < BytesPerPixel) {//第一列
+				unsigned char tmp = bufout[offset + i - BytesPerRow];//b
+				unsigned char v = line[i] + tmp;//x = x' + b
 				bufout[offset + i] = v & 0xff;
 			}
-			else {
-				unsigned char a = bufout[offset + i - BytesPerPixel];
-				unsigned char b = bufout[offset + i - BytesPerRow];
-				unsigned char c = bufout[offset + i - BytesPerPixel - BytesPerRow];
+			else {//不是第一列
+				unsigned char a = bufout[offset + i - BytesPerPixel];//a
+				unsigned char b = bufout[offset + i - BytesPerRow];//b
+				unsigned char c = bufout[offset + i - BytesPerPixel - BytesPerRow];//c
 
 			//	int p = a + b - c;
 				int pa = abs(b-c);
 				int pb = abs(a-c);
-				int pc = abs(a+b - 2*c);
+				int pc = abs(a+b-c-c);
 				unsigned char pr;
 
 				if (pa <= pb && pa <= pc) pr = a;
 				else if (pb <= pc) pr = b;
 				else pr = c;
 
-				unsigned char v = line[i] + pr;
+				unsigned char v = line[i] + pr;//x = x' + pr
 				bufout[offset + i] = v & 0xff;
 			}
 		}
