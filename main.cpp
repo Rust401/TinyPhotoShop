@@ -53,23 +53,35 @@ int main()
     l1.setLayerName("doubi 1");
     RS::BasicLayer l2(2048,2048);
     l2.setLayerName("doubi 2");
+    l2.upDownReverse();
     RS::BasicLayer l3(40,40);
     l3.setLayerName("doubi 3");
-    RS::BasicLayer l4(81,81);
+    RS::BasicLayer l4(baba);
     l4.setLayerName("doubi 4");
-    l4.setInvalid();
+
+    l4.displayData();
+    std::cout<<std::endl;
+    l4.upDownReverse();
+    l4.displayData();
+    l4.leftRightReverse();
+    std::cout<<std::endl;
+    l4.displayData();
+
+
+    //l4.setInvalid();
     RS::BasicImage img;
     img.insert(l1);
     img.insert(l2);
     img.insert(l3);
     img.insert(l4);
+    img.displayHash();
+    std::cout<<std::endl;
     img.taylor("doubi 1",array);
     img.updateLayer("doubi 4",caca);
     img.duplicate("doubi 4");
     img.duplicate("doubi 3");
     img.swap("doubi 1","doubi 2");
     img.displayHash();
-    
     img.display();
     
 

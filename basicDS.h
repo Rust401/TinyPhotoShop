@@ -71,6 +71,7 @@ public:
     virtual const std::string& getLayerName() const {return name;}
     virtual uint16_t getLayerNumber() const {return layerNumber;}
     virtual bool isValid() const {return Valid;}
+    virtual bool haveSize() const;
 
     virtual void setDataMatrix(const pointMatrix& matrix){datamatrix=matrix;}
     virtual void setDataMatrix(const std::vector<std::vector<uint32_t>>& buffer);
@@ -79,12 +80,14 @@ public:
     virtual void setValid(){Valid=true;}
     virtual void setInvalid(){Valid=false;}
 
-    virtual void rightRotate();
-    virtual void leftRotate();
-    virtual void upDownReverse();
-    virtual void leftRightReverse();
+    virtual bool rightRotate();
+    virtual bool leftRotate();
+    virtual bool upDownReverse();
+    virtual bool leftRightReverse();
     virtual bool taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_t columnE);
 
+    //virtual void rotateDude(int* a,int* b,int* c,int* d,pointMatrix& matrix);
+    
     BasicLayer& operator=(const BasicLayer& layer);
 };
 
@@ -99,7 +102,14 @@ protected:
     uint16_t current;
     bool indexOK(const uint16_t index){return index>=0&&index<layers.size();}
 public:
-    BasicImage(){}
+    BasicImage(){
+        const std::string& name="default";
+        this->name=name;
+        uint16_t currentIndex=0;
+        validLayer=0;
+        totalLayer=0;
+        current=0;
+    }
 
     BasicImage(const BasicLayer& aLayer,const std::string& name="default"):
         name(name){

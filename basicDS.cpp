@@ -108,6 +108,12 @@ void RS::BasicLayer::displayData(){
     }
 }
 
+bool RS::BasicLayer::haveSize() const{
+    if(datamatrix.size()==0)return false;
+    if(datamatrix[0].size()==0)return false;
+    return true;
+}
+
 void RS::BasicLayer::setDataMatrix(const dataBuffer& data){
     uint16_t newWidth,newLength;
     if(data.size()==0||data[0].size()==0){
@@ -134,20 +140,48 @@ RS::BasicLayer& RS::BasicLayer::operator=(const BasicLayer& l){
     return *this;
 }
 
-void RS::BasicLayer::rightRotate(){
+bool RS::BasicLayer::rightRotate(){
+    if(!haveSize())return false;
+    if(datamatrix.size()==datamatrix[0].size()){
+        
+    }else{
 
+    }
 }
 
-void RS::BasicLayer::leftRotate(){
+bool RS::BasicLayer::leftRotate(){
+    if(!haveSize())return false;
+    if(datamatrix.size()==datamatrix[0].size()){
+        
+    }else{
 
+    }
 }
 
-void RS::BasicLayer::upDownReverse(){
-
+bool RS::BasicLayer::upDownReverse(){
+    if(!haveSize())return false;
+    uint16_t low=0;
+    uint16_t high=datamatrix.size()-1;
+    while(low<=high){
+        for(int i=0;i<datamatrix[0].size();++i){
+            std::swap(datamatrix[low][i],datamatrix[high][i]);
+        }
+        ++low;
+        --high;
+    }
+    return true;;
 }
 
-void RS::BasicLayer::leftRightReverse(){
-
+bool RS::BasicLayer::leftRightReverse(){
+    if(!haveSize())return false;
+    for(int i=0;i<datamatrix.size();++i){
+        uint16_t left=0;
+        uint16_t right=datamatrix[0].size()-1;
+        while(left<=right){
+            std::swap(datamatrix[i][left--],datamatrix[i][right--]);
+        }
+    }
+    return false;
 }
 
 bool RS::BasicLayer::taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_t columnE){
