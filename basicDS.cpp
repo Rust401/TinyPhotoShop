@@ -140,22 +140,50 @@ RS::BasicLayer& RS::BasicLayer::operator=(const BasicLayer& l){
     return *this;
 }
 
+bool RS::BasicLayer::squareRotate(){
+    int n=datamatrix.size();
+    for(int row=0;row<=(n-1)/2;++row)
+    {
+        for(int column=row;column<n-row-1;++column)
+        {
+            int a[2]={row,column};
+            int b[2]={column,n-1-row};
+            int c[2]={n-1-row,n-1-column};
+            int d[2]={n-1-column,row};
+            RS::BasicPoint tmp=datamatrix[d[0]][d[1]];
+            datamatrix[d[0]][d[1]]=datamatrix[c[0]][c[1]];
+            datamatrix[c[0]][c[1]]=datamatrix[b[0]][b[1]];
+            datamatrix[b[0]][b[1]]=datamatrix[a[0]][a[1]];
+            datamatrix[a[0]][a[1]]=tmp;
+        }
+    }
+    return true; 
+}
+
+bool RS::BasicLayer::rectangleRotate(){
+    //return true;
+}
+
 bool RS::BasicLayer::rightRotate(){
     if(!haveSize())return false;
     if(datamatrix.size()==datamatrix[0].size()){
-        
+        if(squareRotate())return true;
     }else{
-
+        if(rectangleRotate())return true;
     }
+    return false;
 }
 
 bool RS::BasicLayer::leftRotate(){
     if(!haveSize())return false;
     if(datamatrix.size()==datamatrix[0].size()){
-        
+        for(int i=0;i<3;++i)if(!squareRotate())return false;
+        return true;
     }else{
-
+        for(int i=0;i<3;++i)if(!rectangleRotate())return false;
+        return true;
     }
+    return false;
 }
 
 bool RS::BasicLayer::upDownReverse(){

@@ -86,6 +86,9 @@ public:
     virtual bool leftRightReverse();
     virtual bool taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_t columnE);
 
+    virtual bool squareRotate();
+    virtual bool rectangleRotate();
+
     //virtual void rotateDude(int* a,int* b,int* c,int* d,pointMatrix& matrix);
     
     BasicLayer& operator=(const BasicLayer& layer);
