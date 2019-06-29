@@ -35,6 +35,7 @@ int main()
     RS::BasicLayer l2(2048,2048);
     l2.setLayerName("doubi 2");
 
+
     //40*40 layer
     RS::BasicLayer l3(40,80);
     l3.setLayerName("doubi 3");
@@ -83,6 +84,8 @@ int main()
 
     //show the key-value of the hash  name - index
     img.displayHash();
+    img.reHash();
+    img.displayHash();
 
     std::cout<<std::endl;
 
@@ -102,11 +105,22 @@ int main()
 
     //show the key-value of the hash  name - index
     img.displayHash();
+    img.reHash();
+    img.displayHash();
 
     //get the layer and put the layer to the buffer gived
     RS::BasicLayer caiji=img.getLayer("doubi 1");
     dataBuffer testbuffer;
     caiji.getDataBuffer(testbuffer);
+
+    //remove the layer
+    img.remove("doubi 1");
+    img.remove("doubi 2");
+    img.remove("doubi 3");
+    img.remove("doubi 4");
+
+    img.displayHash();
+
     
     //show the whole info of the image
     img.display();

@@ -266,6 +266,34 @@ bool RS::BasicLayer::taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_
 //--------BasicImage----------------
 //----------------------------------
 
+RS::BasicImage::BasicImage(){
+    const std::string& name="default";
+    this->name=name;
+    uint16_t currentIndex=0;
+    validLayer=0;
+    totalLayer=0;
+    current=0;
+}
+
+RS::BasicImage::BasicImage(const BasicLayer& aLayer,const std::string& name):name(name){
+    uint16_t currentIndex=0;
+    validLayer=0;
+    totalLayer=0;
+    current=0;
+    insert(aLayer);
+}
+
+
+RS::BasicImage::BasicImage(const uint16_t width,const uint16_t length,const std::string& name){
+    uint16_t currentIndex=0;
+    validLayer=0;
+    totalLayer=0;
+    current=0;
+    RS::BasicLayer aLayer(width,length);
+    insert(aLayer);
+}
+
+
 void RS::BasicImage::reInit(const uint16_t width,const uint16_t length){
     nameToIndex.clear();
     RS::BasicLayer newLayer(width,length);
@@ -331,6 +359,14 @@ RS::BasicLayer& RS::BasicImage::getCurrentLayer(){
     return RS::BasicImage::getLayer(current);
 }
 
+bool RS::BasicImage::reHash(){
+    nameToIndex.clear();
+    for(int i=0;i<layers.size();++i){
+        if(nameToIndex.insert({layers[i].getLayerName(),i}).second==false)return false;
+    }
+    return true;
+}
+
 bool RS::BasicImage::remove(const uint16_t index){
     if(index>=layers.size()||index<0){
         err("Index error.\n");
@@ -340,8 +376,12 @@ bool RS::BasicImage::remove(const uint16_t index){
     for(auto i=nameToIndex.begin();i!=nameToIndex.end();++i){
         if(i->second==index)nameToIndex.erase(i->first);
     }
+    if(layers[index].isValid())--validLayer;
+    --totalLayer;
     layers.erase(layers.begin()+index);
-    return true;
+    if(reHash())return true;
+    err("NameToIndex reHash error.");
+    return false;
 }
 
 bool RS::BasicImage::remove(const std::string& name){
@@ -350,8 +390,8 @@ bool RS::BasicImage::remove(const std::string& name){
         return false;
     }
     uint16_t index=nameToIndex[name];
-    RS::BasicImage::remove(index);
-    return true;
+    if(RS::BasicImage::remove(index))return true;
+    return false;
 }
 
 bool RS::BasicImage::duplicate(const uint16_t index){
@@ -441,7 +481,7 @@ bool RS::BasicImage::taylor(const uint16_t index,const std::vector<uint16_t>& ar
 }
 
 void RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2){
-
+    
 }
 void RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2){
     

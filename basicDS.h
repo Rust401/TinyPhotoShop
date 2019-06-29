@@ -106,33 +106,10 @@ protected:
     uint16_t current;
     bool indexOK(const uint16_t index){return index>=0&&index<layers.size();}
 public:
-    BasicImage(){
-        const std::string& name="default";
-        this->name=name;
-        uint16_t currentIndex=0;
-        validLayer=0;
-        totalLayer=0;
-        current=0;
-    }
+    BasicImage();
+    BasicImage(const BasicLayer& aLayer,const std::string& name="default");
 
-    BasicImage(const BasicLayer& aLayer,const std::string& name="default"):
-        name(name){
-        uint16_t currentIndex=0;
-        validLayer=0;
-        totalLayer=0;
-        current=0;
-        insert(aLayer);
-    }
-
-    BasicImage(const uint16_t width,const uint16_t length,
-        const std::string& name="default"){
-        uint16_t currentIndex=0;
-        validLayer=0;
-        totalLayer=0;
-        current=0;
-        RS::BasicLayer aLayer(width,length);
-        insert(aLayer);
-    }
+    BasicImage(const uint16_t width,const uint16_t length, const std::string& name="default");
     BasicImage(const dataBuffer& data){
         const std::string& name="default";
         uint16_t currentIndex=0;
@@ -148,6 +125,7 @@ public:
     virtual void reInit(const uint16_t width=0,const uint16_t length=0);
     virtual void display() const;
     virtual void displayHash() const;
+    virtual bool reHash();
 
     virtual const std::string& getImageName() const;
     virtual RS::BasicLayer& getLayer(const std::string& name);
