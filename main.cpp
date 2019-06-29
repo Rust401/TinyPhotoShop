@@ -12,7 +12,8 @@ int main()
     dataBuffer haha(1024,rowData(1024,0xffffffff));
     dataBuffer baba={{0x11111111,0x22222222,0xffffffff},
                      {0x33333333,0x44444444,0x3f3f3f3f},
-                     {0x11111111,0x22222222,0xffffffff}};
+                     {0x11111111,0x22222222,0xffffffff},
+                     {0x33333333,0x44444444,0x3f3f3f3f}};
     dataBuffer caca(2048,rowData(2048,0x3f3f3f3f));
 
     //The array use to pass the start and end index of the taylor function
@@ -101,6 +102,11 @@ int main()
 
     //show the key-value of the hash  name - index
     img.displayHash();
+
+    //get the layer and put the layer to the buffer gived
+    RS::BasicLayer caiji=img.getLayer("doubi 1");
+    dataBuffer testbuffer;
+    caiji.getDataBuffer(testbuffer);
     
     //show the whole info of the image
     img.display();

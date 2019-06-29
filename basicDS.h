@@ -68,6 +68,7 @@ public:
 
     virtual const pointMatrix& getDataMatrix() const {return datamatrix;}
     virtual pointMatrix& getDataMatrix() {return datamatrix;}
+    virtual void getDataBuffer(dataBuffer& result) const;
     virtual const std::string& getLayerName() const {return name;}
     virtual uint16_t getLayerNumber() const {return layerNumber;}
     virtual bool isValid() const {return Valid;}

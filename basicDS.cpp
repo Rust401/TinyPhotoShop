@@ -140,6 +140,21 @@ RS::BasicLayer& RS::BasicLayer::operator=(const BasicLayer& l){
     return *this;
 }
 
+void  RS::BasicLayer::getDataBuffer(dataBuffer& result) const{
+    uint16_t width=0;
+    uint16_t length=0;
+    if(haveSize()){
+        width=datamatrix.size();
+        length=datamatrix[0].size();
+    }
+    result=dataBuffer(width,rowData(length));
+    for(int i=0;i<width;++i){
+        for(int j=0;j<length;++j){
+            result[i][j]=datamatrix[i][j].getUint32();
+        }
+    }
+}
+
 bool RS::BasicLayer::squareRotate(){
     int n=datamatrix.size();
     for(int row=0;row<=(n-1)/2;++row)
@@ -161,7 +176,18 @@ bool RS::BasicLayer::squareRotate(){
 }
 
 bool RS::BasicLayer::rectangleRotate(){
-    //return true;
+    if(!haveSize())return false;
+    if(datamatrix.size()==datamatrix[0].size())return false;
+    uint16_t length=datamatrix.size();
+    uint16_t width=datamatrix[0].size();
+    pointMatrix newDataMatrix(width,std::vector<RS::BasicPoint>(length));
+    for(int i=0;i<length;++i){
+        for(int j=0;j<width;++j){
+            newDataMatrix[length-1-j][i]=datamatrix[i][j];
+        }
+    }
+    datamatrix=newDataMatrix;
+    return true;
 }
 
 bool RS::BasicLayer::rightRotate(){
