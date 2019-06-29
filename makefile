@@ -16,5 +16,9 @@ t: clean
 	clang++ -std=c++11 -o tt main.cpp basicDS.cpp utils.cpp
 	./tt
 
+png: clean
+	clang++ -std=c++11 -o  png pngRead.cpp
+	./png
+
 clean:
 	rm -f point layer image tt

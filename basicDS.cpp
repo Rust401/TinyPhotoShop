@@ -5,11 +5,23 @@ using namespace RS;
 //----------------------------------
 //--------BasicPoint----------------
 //----------------------------------
+RS::BasicPoint::BasicPoint(const uint32_t data)
+{
+    //Don't use the memset to initial
+    //this class have virtual function!!
+    reInit(data);
+}
+
 void RS::BasicPoint::reInit(){
     red=0;
     green=0;
     blue=0;
     alpha=0;
+}
+
+void RS::BasicPoint::reInit(const uint32_t data){
+    uint8_t* p=(uint8_t*)&data;
+    red=*p;green=*(p+1);blue=*(p+2);alpha=*(p+3);
 }
 
 void RS::BasicPoint::display(){
@@ -26,9 +38,23 @@ BasicPoint& RS::BasicPoint::operator=(const BasicPoint& p){
     return *this;
 }
 
+uint32_t RS::BasicPoint::getUint32() const{
+    uint32_t result;
+    uint8_t* p=(uint8_t*)&result;
+    *p=getRed();
+    *(p+1)=getGreen();
+    *(p+2)=getBlue();
+    *(p+3)=getAlpha();
+    return result;
+}
+
+
 //----------------------------------
 //--------BasicLayer----------------
 //----------------------------------
+RS::BasicLayer::BasicLayer(const dataBuffer& data){
+    reInit(data);
+}
 
 void RS::BasicLayer::reInit(){
     pointMatrix newMatrix(0,std::vector<RS::BasicPoint>(0));
@@ -46,6 +72,20 @@ void RS::BasicLayer::reInit(const int16_t width,const int16_t length){
     Valid=true;  
 }
 
+void RS::BasicLayer::reInit(const dataBuffer& data){
+    if(data.size()==0)reInit();
+    if(data[0].size()==0)reInit();
+    uint16_t width=data.size();
+    uint16_t length=data[0].size();
+    reInit(width,length);
+    //use the buffer we get to init our layer
+    for(int i=0;i<width;++i){
+        for(int j=0;j<length;++j){
+            datamatrix[i][j].reInit(data[i][j]);
+        }
+    }
+}
+
 void RS::BasicLayer::display(){
     printf("DataMatrix:  %p\n",&datamatrix);
     printf("Name:        %s\n",name.c_str());
@@ -53,6 +93,43 @@ void RS::BasicLayer::display(){
     printf("Valid:       %d\n",(int16_t)Valid);
     printf("Width:       %zu\n",datamatrix.size());
     printf("Length:      %zu\n",datamatrix.size()==0?0:datamatrix[0].size());
+}
+
+void RS::BasicLayer::displayData(){
+    if(datamatrix.size()==0){std::cout<<"null"<<std::endl;return;}
+    if(datamatrix[0].size()==0){std::cout<<"null"<<std::endl;return;}
+    for(int i=0;i<datamatrix.size();++i){
+        for(int j=0;j<datamatrix[0].size();++j){
+            RS::BasicPoint tmp=datamatrix[i][j];
+            printf("%x %x %x %x   ",tmp.getRed(),tmp.getGreen(),tmp.getBlue(),
+                tmp.getAlpha());
+        }
+        std::cout<<std::endl;
+    }
+}
+
+bool RS::BasicLayer::haveSize() const{
+    if(datamatrix.size()==0)return false;
+    if(datamatrix[0].size()==0)return false;
+    return true;
+}
+
+void RS::BasicLayer::setDataMatrix(const dataBuffer& data){
+    uint16_t newWidth,newLength;
+    if(data.size()==0||data[0].size()==0){
+        newWidth=0;
+        newLength=0;
+    }else{
+        newWidth=data.size();
+        newLength=data[0].size();
+    }
+    pointMatrix newDataMatrix(newWidth,std::vector<RS::BasicPoint>(newLength));
+    for(int i=0;i<newWidth;++i){
+        for(int j=0;j<newLength;++j){
+            newDataMatrix[i][j].reInit(data[i][j]);
+        }
+    }
+    datamatrix=newDataMatrix;
 }
 
 RS::BasicLayer& RS::BasicLayer::operator=(const BasicLayer& l){
@@ -63,10 +140,159 @@ RS::BasicLayer& RS::BasicLayer::operator=(const BasicLayer& l){
     return *this;
 }
 
+void  RS::BasicLayer::getDataBuffer(dataBuffer& result) const{
+    uint16_t width=0;
+    uint16_t length=0;
+    if(haveSize()){
+        width=datamatrix.size();
+        length=datamatrix[0].size();
+    }
+    result=dataBuffer(width,rowData(length));
+    for(int i=0;i<width;++i){
+        for(int j=0;j<length;++j){
+            result[i][j]=datamatrix[i][j].getUint32();
+        }
+    }
+}
+
+bool RS::BasicLayer::squareRotate(){
+    int n=datamatrix.size();
+    for(int row=0;row<=(n-1)/2;++row)
+    {
+        for(int column=row;column<n-row-1;++column)
+        {
+            int a[2]={row,column};
+            int b[2]={column,n-1-row};
+            int c[2]={n-1-row,n-1-column};
+            int d[2]={n-1-column,row};
+            RS::BasicPoint tmp=datamatrix[d[0]][d[1]];
+            datamatrix[d[0]][d[1]]=datamatrix[c[0]][c[1]];
+            datamatrix[c[0]][c[1]]=datamatrix[b[0]][b[1]];
+            datamatrix[b[0]][b[1]]=datamatrix[a[0]][a[1]];
+            datamatrix[a[0]][a[1]]=tmp;
+        }
+    }
+    return true; 
+}
+
+bool RS::BasicLayer::rectangleRotate(){
+    if(!haveSize())return false;
+    if(datamatrix.size()==datamatrix[0].size())return false;
+    uint16_t length=datamatrix.size();
+    uint16_t width=datamatrix[0].size();
+    pointMatrix newDataMatrix(width,std::vector<RS::BasicPoint>(length));
+    for(int i=0;i<length;++i){
+        for(int j=0;j<width;++j){
+            newDataMatrix[width-1-j][i]=datamatrix[i][j];
+        }
+    }
+    datamatrix=newDataMatrix;
+    return true;
+}
+
+bool RS::BasicLayer::rightRotate(){
+    if(!haveSize())return false;
+    if(datamatrix.size()==datamatrix[0].size()){
+        if(squareRotate())return true;
+    }else{
+        if(rectangleRotate())return true;
+    }
+    return false;
+}
+
+bool RS::BasicLayer::leftRotate(){
+    if(!haveSize())return false;
+    if(datamatrix.size()==datamatrix[0].size()){
+        for(int i=0;i<3;++i)if(!squareRotate())return false;
+        return true;
+    }else{
+        for(int i=0;i<3;++i)if(!rectangleRotate())return false;
+        return true;
+    }
+    return false;
+}
+
+bool RS::BasicLayer::upDownReverse(){
+    if(!haveSize())return false;
+    uint16_t low=0;
+    uint16_t high=datamatrix.size()-1;
+    while(low<=high){
+        for(int i=0;i<datamatrix[0].size();++i){
+            std::swap(datamatrix[low][i],datamatrix[high][i]);
+        }
+        ++low;
+        --high;
+    }
+    return true;;
+}
+
+bool RS::BasicLayer::leftRightReverse(){
+    if(!haveSize())return false;
+    for(int i=0;i<datamatrix.size();++i){
+        uint16_t left=0;
+        uint16_t right=datamatrix[0].size()-1;
+        while(left<=right){
+            std::swap(datamatrix[i][left--],datamatrix[i][right--]);
+        }
+    }
+    return false;
+}
+
+bool RS::BasicLayer::taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_t columnE){
+    if(datamatrix.size()==0)return false;
+    if(datamatrix[0].size()==0)return false;
+    if(rowS<0||rowS>=datamatrix.size())return false;
+    if(columnS<0||columnS>datamatrix[0].size())return false;
+    if(rowE<0||rowE>=datamatrix.size()||rowE<=rowS)return false;
+    if(columnE<0||columnE>=datamatrix[0].size()||columnE<=columnS)return false;
+    uint16_t newWidth=rowE-rowS+1;
+    uint16_t newLength=columnE-columnS+1;
+    dataBuffer tmp(newWidth,rowData(newLength,0));
+    for(int i=rowS;i<rowE;++i){
+        for(int j=columnS;j<columnS;++j){
+            tmp[i][j]=datamatrix[i][j].getUint32();
+        }
+    }
+    std::string newName=name;
+    bool newValid=isValid();
+    reInit(tmp);
+    name=newName;
+    Valid=newValid;
+    return true;
+}
+
 
 //----------------------------------
 //--------BasicImage----------------
 //----------------------------------
+
+RS::BasicImage::BasicImage(){
+    const std::string& name="default";
+    this->name=name;
+    uint16_t currentIndex=0;
+    validLayer=0;
+    totalLayer=0;
+    current=0;
+}
+
+RS::BasicImage::BasicImage(const BasicLayer& aLayer,const std::string& name):name(name){
+    uint16_t currentIndex=0;
+    validLayer=0;
+    totalLayer=0;
+    current=0;
+    insert(aLayer);
+}
+
+
+RS::BasicImage::BasicImage(const uint16_t width,const uint16_t length,const std::string& name){
+    uint16_t currentIndex=0;
+    validLayer=0;
+    totalLayer=0;
+    current=0;
+    RS::BasicLayer aLayer(width,length);
+    insert(aLayer);
+}
+
 
 void RS::BasicImage::reInit(const uint16_t width,const uint16_t length){
     nameToIndex.clear();
@@ -103,6 +329,13 @@ bool RS::BasicImage::insert(const RS::BasicLayer& aLayer){
     return false;
 }
 
+bool RS::BasicImage::insert(const std::string& name,const dataBuffer& buffer){
+    RS::BasicLayer newLayer(buffer);
+    newLayer.setLayerName(name);
+    if(insert(newLayer))return true;
+    return false;
+}
+
 const std::string& RS::BasicImage::getImageName() const {
     return this->name;
 }
@@ -126,6 +359,14 @@ RS::BasicLayer& RS::BasicImage::getCurrentLayer(){
     return RS::BasicImage::getLayer(current);
 }
 
+bool RS::BasicImage::reHash(){
+    nameToIndex.clear();
+    for(int i=0;i<layers.size();++i){
+        if(nameToIndex.insert({layers[i].getLayerName(),i}).second==false)return false;
+    }
+    return true;
+}
+
 bool RS::BasicImage::remove(const uint16_t index){
     if(index>=layers.size()||index<0){
         err("Index error.\n");
@@ -135,8 +376,12 @@ bool RS::BasicImage::remove(const uint16_t index){
     for(auto i=nameToIndex.begin();i!=nameToIndex.end();++i){
         if(i->second==index)nameToIndex.erase(i->first);
     }
+    if(layers[index].isValid())--validLayer;
+    --totalLayer;
     layers.erase(layers.begin()+index);
-    return true;
+    if(reHash())return true;
+    err("NameToIndex reHash error.");
+    return false;
 }
 
 bool RS::BasicImage::remove(const std::string& name){
@@ -145,8 +390,8 @@ bool RS::BasicImage::remove(const std::string& name){
         return false;
     }
     uint16_t index=nameToIndex[name];
-    RS::BasicImage::remove(index);
-    return true;
+    if(RS::BasicImage::remove(index))return true;
+    return false;
 }
 
 bool RS::BasicImage::duplicate(const uint16_t index){
@@ -190,6 +435,56 @@ bool RS::BasicImage::swap(const std::string& name1,const std::string& name2){
         return false;
     }
     return RS::BasicImage::swap(nameToIndex[name1],nameToIndex[name2]);
+}
+
+bool RS::BasicImage::updateLayer(const uint16_t index,const dataBuffer& buffer){
+    if(index>=layers.size()||index<0){
+        err("Index error.\n");
+        return false;
+    }
+    RS::BasicLayer newLayer(buffer);
+    std::string tmpName=layers[index].getLayerName();
+    bool tmpValid=layers[index].isValid();
+    newLayer.setLayerName(tmpName);
+    if(tmpValid)newLayer.setValid();
+    else newLayer.setInvalid();
+    layers[index]=newLayer;
+    return true;
+}
+
+bool RS::BasicImage::updateLayer(const std::string& name,const dataBuffer& buffer){
+    if(!nameToIndex.count(name)){
+        err("No such layer\n");
+        return false;
+    }
+    uint16_t index=nameToIndex[name];
+    if(updateLayer(index,buffer))return true;
+    return false;
+}
+
+bool RS::BasicImage::taylor(const std::string& name,const std::vector<uint16_t>& array){
+    if(!nameToIndex.count(name)){
+        err("No such layer\n");
+        return false;
+    }
+    uint16_t index=nameToIndex[name];
+    if(taylor(index,array))return true;
+    return false;
+}
+bool RS::BasicImage::taylor(const uint16_t index,const std::vector<uint16_t>& array){
+    if(index>=layers.size()||index<0){
+        err("Index error.\n");
+        return false;
+    }
+    if(layers[index].taylor(array[0],array[1],array[2],array[3]))return true;
+    return false;
+}
+
+void RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2){
+    
+}
+void RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2){
+    
 }
 
 

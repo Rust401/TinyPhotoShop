@@ -8,35 +8,122 @@ void foo(RS::BasicLayer& srcs){
 
 int main()
 {
+    //The test matir
+    dataBuffer haha(1024,rowData(1024,0xffffffff));
+    dataBuffer baba={{0x11111111,0x22222222,0xffffffff},
+                     {0x33333333,0x44444444,0x3f3f3f3f},
+                     {0x11111111,0x22222222,0xffffffff},
+                     {0x33333333,0x44444444,0x3f3f3f3f}};
+    dataBuffer caca(2048,rowData(2048,0x3f3f3f3f));
 
-    /* std::vector<std::vector<RS::BasicPoint>> a(1,std::vector<RS::BasicPoint>(1,RS::BasicPoint(0,0,0,0)));
-    std::vector<std::vector<RS::BasicPoint>> b(1,std::vector<RS::BasicPoint>(1));
-    std::cout<<"shifoer"<<std::endl;
-    pointMatrix shabi=a; */
+    //The array use to pass the start and end index of the taylor function
+    //rowStart columnStart rowEnd columnEnd
+    std::vector<uint16_t> array={30,30,60,60};
 
-    /* int a=100;
-    const int& b=a;
-    std::cout<<&b<<std::endl; */
-    RS::BasicLayer l1(100,100);
+    //Here we inital the layer use the different method
+    //--------------------------------------------------
+
+    //initial a layer with size 1024*1024, all Point are {0,0,0,0}
+    //Don't forget to give the layer a name for the reason that layer
+    //will be insert into a hashmap with the key of the name to get the
+    //index in the layer vector
+    //the default name of the initalized layer is "default"
+    RS::BasicLayer l1(1024,1024);
     l1.setLayerName("doubi 1");
-    RS::BasicLayer l2(1200,10);
+
+    //intial a layer with size 2048*2048
+    RS::BasicLayer l2(2048,2048);
     l2.setLayerName("doubi 2");
-    RS::BasicLayer l3(5,5);
+
+
+    //40*40 layer
+    RS::BasicLayer l3(40,80);
     l3.setLayerName("doubi 3");
-    RS::BasicLayer l4(7,120);
+
+    //use the dataBuffer to initial the layer
+    //baba 3*3
+    RS::BasicLayer l4(baba);
     l4.setLayerName("doubi 4");
+
+    //display the data layout of the layer
+    l4.displayData();
+
+    std::cout<<std::endl;
+
+    //up down reverse the layer 
+    l4.upDownReverse();
+    l4.displayData();
+
+    //left right reverse the layer
+    l4.leftRightReverse();
+    std::cout<<std::endl;
+    l4.displayData();
+
+    //right rotate the layer
+    l4.rightRotate();
+    std::cout<<std::endl;
+    l4.displayData();
+
+    std::cout<<std::endl;
+
+    //left rotate the layer
+    l4.leftRotate();
+    l4.displayData();
+
+    //set the state of the l4 invalid
+    l4.setInvalid();
+
+    //initial the image object with no layer
     RS::BasicImage img;
+
+    //insert the 4 layer
     img.insert(l1);
     img.insert(l2);
     img.insert(l3);
     img.insert(l4);
 
+    //show the key-value of the hash  name - index
     img.displayHash();
-    img.swap("doubi 3","doubi 4");
+    img.reHash();
     img.displayHash();
-    img.swap("doubi 2","doubi 3");
+
+    std::cout<<std::endl;
+
+    //cur the layer named "doubi 1" with the data in the array
+    img.taylor("doubi 1",array);
+
+    //update the layer named "doubi4" with the databuffer
+    img.updateLayer("doubi 4",caca);
+
+    //duplicate the layer named "doubi 4" and the new layer named "doubi 4_dup"
+    img.duplicate("doubi 4");
+    //duplicate the layer named "doubi 3" and the new layer named "doubi 3_dup"
+    img.duplicate("doubi 3");
+
+    //swap the position of the layer named "doubi 1" and "doubi 2"
+    img.swap("doubi 1","doubi 2");
+
+    //show the key-value of the hash  name - index
     img.displayHash();
-    img.display();
+    img.reHash();
+    img.displayHash();
+
+    //get the layer and put the layer to the buffer gived
+    RS::BasicLayer caiji=img.getLayer("doubi 1");
+    dataBuffer testbuffer;
+    caiji.getDataBuffer(testbuffer);
+
+    //remove the layer
+    img.remove("doubi 1");
+    img.remove("doubi 2");
+    img.remove("doubi 3");
+    img.remove("doubi 4");
+
+    img.displayHash();
+
     
+    //show the whole info of the image
+    img.display();
+        
 
 }
