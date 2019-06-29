@@ -183,7 +183,7 @@ bool RS::BasicLayer::rectangleRotate(){
     pointMatrix newDataMatrix(width,std::vector<RS::BasicPoint>(length));
     for(int i=0;i<length;++i){
         for(int j=0;j<width;++j){
-            newDataMatrix[length-1-j][i]=datamatrix[i][j];
+            newDataMatrix[width-1-j][i]=datamatrix[i][j];
         }
     }
     datamatrix=newDataMatrix;
