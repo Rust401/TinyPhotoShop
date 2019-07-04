@@ -114,6 +114,16 @@ bool RS::BasicLayer::haveSize() const{
     return true;
 }
 
+uint16_t RS::BasicLayer::getWidth() const{
+    if(haveSize())return datamatrix.size();
+    else return 0;
+}
+
+uint16_t RS::BasicLayer::getLength() const{
+    if(haveSize())return datamatrix[0].size();
+    else return 0;
+}
+
 void RS::BasicLayer::setDataMatrix(const dataBuffer& data){
     uint16_t newWidth,newLength;
     if(data.size()==0||data[0].size()==0){
@@ -290,6 +300,16 @@ RS::BasicImage::BasicImage(const uint16_t width,const uint16_t length,const std:
     totalLayer=0;
     current=0;
     RS::BasicLayer aLayer(width,length);
+    insert(aLayer);
+}
+
+RS::BasicImage::BasicImage(const dataBuffer& data){
+    const std::string& name="default";
+    uint16_t currentIndex=0;
+    validLayer=0;
+    totalLayer=0;
+    current=0;
+    RS::BasicLayer aLayer(data);
     insert(aLayer);
 }
 
@@ -480,11 +500,38 @@ bool RS::BasicImage::taylor(const uint16_t index,const std::vector<uint16_t>& ar
     return false;
 }
 
-void RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2){
-    
+bool RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2){
+    if(!nameToIndex.count(name1)){
+        err("No such layer name1\n");
+        return false;
+    }
+    if(!nameToIndex.count(name2)){
+        err("No such layer name2\n");
+        return false;
+    }
+    uint16_t index1=nameToIndex[name1];
+    uint16_t index2=nameToIndex[name2];
+    if(mergeLayer(index1,index2))return true;
+    return false;
 }
-void RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2){
-    
+bool RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2){
+    checkFit(index1,index2);
+    if(mergeLayerCore(index1,index2))return true;
+    return false;
+}
+
+bool RS::BasicImage::mergeLayerCore(const uint16_t index1,const uint16_t index2){
+
+}
+
+
+bool RS::BasicImage::checkFit(const uint16_t index1,const uint16_t index2){
+    if(!indexOK(index1)||!indexOK(index2))return false;
+    RS::BasicLayer l1=layers[index1];
+    RS::BasicLayer l2=layers[index2];
+    if(!l1.haveSize()||!l2.haveSize())return false;
+    if(l1.getWidth()!=l2.getWidth()||l1.getLength()!=l2.getLength())return false;
+    return true;
 }
 
 

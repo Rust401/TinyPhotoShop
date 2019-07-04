@@ -5,12 +5,12 @@ void foo(RS::BasicLayer& srcs){
     srcs.setDataMatrix(data);
 }
 
-
+/* 
 int main()
 {
     //The test matir
     dataBuffer haha(1024,rowData(1024,0xffffffff));
-    dataBuffer baba={{0x11111111,0x22222222,0xffffffff},
+    dataBuffer baba={{0x1f2f3f4f,0x22222222,0xffffffff},
                      {0x33333333,0x44444444,0x3f3f3f3f},
                      {0x11111111,0x22222222,0xffffffff},
                      {0x33333333,0x44444444,0x3f3f3f3f}};
@@ -126,4 +126,19 @@ int main()
     img.display();
         
 
+} */
+
+
+int main()
+{
+    dataBuffer baba(10,rowData(7,0x2f3f4f5f));
+    RS::BasicLayer l1(baba);
+    dataBuffer mama;
+    l1.getDataBuffer(mama);
+    RS::BasicLayer l2(mama);
+    l1.display();
+    l2.display();
+    l1.displayData();
+    std::cout<<std::endl;
+    l1.displayData();
 }

@@ -71,6 +71,8 @@ public:
     virtual void getDataBuffer(dataBuffer& result) const;
     virtual const std::string& getLayerName() const {return name;}
     virtual uint16_t getLayerNumber() const {return layerNumber;}
+    virtual uint16_t getWidth() const;
+    virtual uint16_t getLength() const;
     virtual bool isValid() const {return Valid;}
     virtual bool haveSize() const;
 
@@ -108,20 +110,10 @@ protected:
 public:
     BasicImage();
     BasicImage(const BasicLayer& aLayer,const std::string& name="default");
-
     BasicImage(const uint16_t width,const uint16_t length, const std::string& name="default");
-    BasicImage(const dataBuffer& data){
-        const std::string& name="default";
-        uint16_t currentIndex=0;
-        validLayer=0;
-        totalLayer=0;
-        current=0;
-        RS::BasicLayer aLayer(data);
-        insert(aLayer);
-    }
-    ~BasicImage(){}
+    BasicImage(const dataBuffer& data);
+    virtual ~BasicImage(){}
 
-    
     virtual void reInit(const uint16_t width=0,const uint16_t length=0);
     virtual void display() const;
     virtual void displayHash() const;
@@ -146,8 +138,11 @@ public:
     virtual bool taylor(const std::string& name,const std::vector<uint16_t>& array);
     virtual bool taylor(const uint16_t index,const std::vector<uint16_t>& array);
 
-    virtual void mergeLayer(const std::string& name1,const std::string& name2);
-    virtual void mergeLayer(const uint16_t index1,const uint16_t index2);
+    virtual bool mergeLayer(const std::string& name1,const std::string& name2);
+    virtual bool mergeLayer(const uint16_t index1,const uint16_t index2);
+private:
+    virtual bool mergeLayerCore(const uint16_t index1,const uint16_t index2);
+    virtual bool checkFit(const uint16_t index1,const uint16_t index2);
 };
 }
 
