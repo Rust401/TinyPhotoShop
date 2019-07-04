@@ -91,8 +91,6 @@ public:
 
     virtual bool squareRotate();
     virtual bool rectangleRotate();
-
-    //virtual void rotateDude(int* a,int* b,int* c,int* d,pointMatrix& matrix);
     
     BasicLayer& operator=(const BasicLayer& layer);
 };
@@ -106,7 +104,6 @@ protected:
     uint16_t validLayer;
     uint16_t totalLayer;
     uint16_t current;
-    bool indexOK(const uint16_t index){return index>=0&&index<layers.size();}
 public:
     BasicImage();
     BasicImage(const BasicLayer& aLayer,const std::string& name="default");
@@ -143,6 +140,8 @@ public:
 private:
     virtual bool mergeLayerCore(const uint16_t index1,const uint16_t index2);
     virtual bool checkFit(const uint16_t index1,const uint16_t index2);
+    virtual bool indexOK(const uint16_t index);
+    virtual int16_t findByName(const std::string& name);
 };
 }
 

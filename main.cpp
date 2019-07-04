@@ -5,7 +5,7 @@ void foo(RS::BasicLayer& srcs){
     srcs.setDataMatrix(data);
 }
 
-/* 
+
 int main()
 {
     //The test matir
@@ -126,19 +126,4 @@ int main()
     img.display();
         
 
-} */
-
-
-int main()
-{
-    dataBuffer baba(10,rowData(7,0x2f3f4f5f));
-    RS::BasicLayer l1(baba);
-    dataBuffer mama;
-    l1.getDataBuffer(mama);
-    RS::BasicLayer l2(mama);
-    l1.display();
-    l2.display();
-    l1.displayData();
-    std::cout<<std::endl;
-    l1.displayData();
 }

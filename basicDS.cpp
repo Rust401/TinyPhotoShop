@@ -501,16 +501,8 @@ bool RS::BasicImage::taylor(const uint16_t index,const std::vector<uint16_t>& ar
 }
 
 bool RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2){
-    if(!nameToIndex.count(name1)){
-        err("No such layer name1\n");
-        return false;
-    }
-    if(!nameToIndex.count(name2)){
-        err("No such layer name2\n");
-        return false;
-    }
-    uint16_t index1=nameToIndex[name1];
-    uint16_t index2=nameToIndex[name2];
+    uint16_t index1=findByName(name1);
+    uint16_t index2=findByName(name2);
     if(mergeLayer(index1,index2))return true;
     return false;
 }
@@ -520,6 +512,9 @@ bool RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2){
     return false;
 }
 
+//--------------------------------------------------------------------
+//-------------------------BasicImage_private-------------------------
+//--------------------------------------------------------------------
 bool RS::BasicImage::mergeLayerCore(const uint16_t index1,const uint16_t index2){
 
 }
@@ -532,6 +527,18 @@ bool RS::BasicImage::checkFit(const uint16_t index1,const uint16_t index2){
     if(!l1.haveSize()||!l2.haveSize())return false;
     if(l1.getWidth()!=l2.getWidth()||l1.getLength()!=l2.getLength())return false;
     return true;
+}
+
+bool RS::BasicImage::indexOK(const uint16_t index){
+    return index>=0&&index<layers.size();
+}
+
+int16_t RS::BasicImage::findByName(const std::string& name){
+    if(!nameToIndex.count(name)){
+        err("No such layer name1\n");
+        return -1;
+    }
+    return nameToIndex[name];
 }
 
 
