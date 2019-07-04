@@ -38,6 +38,18 @@ BasicPoint& RS::BasicPoint::operator=(const BasicPoint& p){
     return *this;
 }
 
+BasicPoint& RS::BasicPoint::blend(const BasicPoint& dst,blendMode mode){
+    uint8_t AsInt=this->alpha;
+    uint8_t AdInt=dst.alpha;
+    double As=AsInt/255.0;
+    double Ad=AdInt/255.0;
+    std::pair<double,double> factor=getFactor(mode,As,Ad);
+    double Fs=factor.first;
+    double Fd=factor.second;
+    this->red=
+    //TODO
+}
+
 uint32_t RS::BasicPoint::getUint32() const{
     uint32_t result;
     uint8_t* p=(uint8_t*)&result;
@@ -48,6 +60,51 @@ uint32_t RS::BasicPoint::getUint32() const{
     return result;
 }
 
+std::pair<double,double> RS::BasicPoint::getFactor(blendMode mode,double As,double Ad){
+    switch (mode)
+    {
+        case CLEAR:
+            return {0,0};
+            break;
+        case SRC:
+            return {1,0};
+            break;
+        case DST:
+            return {0,1};
+            break;
+        case SRC_OVER:
+            return {1,1-As};
+            break;
+        case DST_OVER:
+            return {1-Ad,1};
+            break;
+        case SRC_IN:
+            return {Ad,0};
+            break;
+        case DST_IN:
+            return {0,As};
+            break;
+        case SRC_OUT:
+            return {1-Ad,0};
+            break;
+        case DST_OUT:
+            return {0,1-As};
+            break;
+        case SRC_ATOP:
+            return {Ad,1-As};
+            break;
+        case DST_ATOP:
+            return {1-Ad,As};
+            break;
+        case XOR:
+            return {1-Ad,1-As};
+            break;
+        default:
+            err("Unknow blend mode\n");
+            return {-1,-1};
+            break;
+    }
+}
 
 //----------------------------------
 //--------BasicLayer----------------
@@ -516,7 +573,10 @@ bool RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2){
 //-------------------------BasicImage_private-------------------------
 //--------------------------------------------------------------------
 bool RS::BasicImage::mergeLayerCore(const uint16_t index1,const uint16_t index2){
-
+    //TODO
+    //TODO
+    //TODO
+    //!!!!!!!!!!!!!!!
 }
 
 
@@ -539,6 +599,54 @@ int16_t RS::BasicImage::findByName(const std::string& name){
         return -1;
     }
     return nameToIndex[name];
+}
+
+std::pair<double,double> RS::BasicImage::getFactor(blendMode mode,double As,double Ad){
+    //maybe init a hash table then the performance will change
+    //test the output time of the image and maybe make the change
+    switch (mode)
+    {
+        case CLEAR:
+            return {0,0};
+            break;
+        case SRC:
+            return {1,0};
+            break;
+        case DST:
+            return {0,1};
+            break;
+        case SRC_OVER:
+            return {1,1-As};
+            break;
+        case DST_OVER:
+            return {1-Ad,1};
+            break;
+        case SRC_IN:
+            return {Ad,0};
+            break;
+        case DST_IN:
+            return {0,As};
+            break;
+        case SRC_OUT:
+            return {1-Ad,0};
+            break;
+        case DST_OUT:
+            return {0,1-As};
+            break;
+        case SRC_ATOP:
+            return {Ad,1-As};
+            break;
+        case DST_ATOP:
+            return {1-Ad,As};
+            break;
+        case XOR:
+            return {1-Ad,1-As};
+            break;
+        default:
+            err("Unknow blend mode\n");
+            return {-1,-1};
+            break;
+    }
 }
 
 

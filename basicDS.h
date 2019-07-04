@@ -15,6 +15,10 @@
 #define dataBuffer std::vector<std::vector<uint32_t>>
 #define rowData std::vector<uint32_t>
 
+enum blendMode {
+    CLEAR,SRC,DST,SRC_OVER,DST_OVER,SRC_IN,SRC_OUT,DST_IN,DST_OUT,SRC_ATOP,DST_ATOP,XOR
+};
+
 namespace RS
 {
 class BasicPoint
@@ -41,6 +45,9 @@ public:
     virtual void setGreen(const uint8_t green){this->green=green;}
     virtual void setBlue(const uint8_t blue){this->blue=blue;}
     virtual void setAlpha(const uint8_t alpha){this->alpha=alpha;}
+
+    virtual std::pair<double,double> getFactor(blendMode mode,double As,double Ad);
+    BasicPoint& blend(const BasicPoint& dst,blendMode mode);
 
     BasicPoint& operator=(const BasicPoint& p);
 };
@@ -142,6 +149,9 @@ private:
     virtual bool checkFit(const uint16_t index1,const uint16_t index2);
     virtual bool indexOK(const uint16_t index);
     virtual int16_t findByName(const std::string& name);
+
+    //waiting to decide if we want add the function here
+    virtual std::pair<double,double> getFactor(blendMode mode,double As,double Ad);
 };
 }
 
