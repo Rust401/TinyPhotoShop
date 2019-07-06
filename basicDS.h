@@ -10,10 +10,12 @@
 #include <memory.h>
 #include <unordered_map>
 #include <math.h>
+#include <algorithm>
 
 #define pointMatrix std::vector<std::vector<RS::BasicPoint>>
 #define dataBuffer std::vector<std::vector<uint32_t>>
 #define rowData std::vector<uint32_t>
+#define rowPoint std::vector<RS::BasicPoint>
 
 enum blendMode {
     CLEAR,SRC,DST,SRC_OVER,DST_OVER,SRC_IN,SRC_OUT,DST_IN,DST_OUT,SRC_ATOP,DST_ATOP,XOR
@@ -146,6 +148,8 @@ public:
     virtual bool mergeLayer(const uint16_t index1,const uint16_t index2,blendMode mode);
 private:
     virtual bool mergeLayerCore(const uint16_t index1,const uint16_t index2,blendMode mode);
+    virtual bool mergeLayerCoreDiff(const uint16_t index1,const uint16_t index2,
+                                    blendMode mode,uint16_t row=0,uint16_t column=0);
     virtual bool checkFit(const uint16_t index1,const uint16_t index2);
     virtual bool indexOK(const uint16_t index);
     virtual int16_t findByName(const std::string& name);

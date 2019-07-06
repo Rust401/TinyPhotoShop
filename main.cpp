@@ -159,7 +159,7 @@ int main()
     img.insert(l4);
     
 
-    img.mergeLayer("dude1","dude2",SRC);
+    img.mergeLayer("dude1","dude2",SRC_OVER);
     RS::BasicLayer pick=img.getLayer(0);
     pick.displayData();
 

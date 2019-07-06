@@ -1,5 +1,6 @@
 #include "basicDS.h"
 #include "utils.h"
+#include <cmath>
 using namespace RS;
 
 //----------------------------------
@@ -11,6 +12,16 @@ RS::BasicPoint::BasicPoint(const uint32_t data)
     //this class have virtual function!!
     reInit(data);
 }
+
+RS::BasicPoint::BasicPoint(const BasicPoint& p)
+{
+    this->red=p.getRed();
+    this->green=p.getGreen();
+    this->blue=p.getBlue();
+    this->alpha=p.getAlpha();
+}
+
+
 
 void RS::BasicPoint::reInit(){
     red=0;
@@ -586,16 +597,34 @@ bool RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2,blen
 bool RS::BasicImage::mergeLayerCore(const uint16_t index1,const uint16_t index2,blendMode mode){
     uint16_t width=layers[index1].getWidth();
     uint16_t length=layers[index1].getLength();
-    pointMatrix dataSrc=layers[index1].getDataMatrix();
-    pointMatrix dataDst=layers[index2].getDataMatrix();
+    //direct modigy the layerdata, no need to build a new matrix and reset the layer
+    pointMatrix& dataSrc=layers[index1].getDataMatrix();
+    pointMatrix& dataDst=layers[index2].getDataMatrix();
     for(int i=0;i<width;++i){
         for(int j=0;j<length;++j){
             dataSrc[i][j].blend(dataDst[i][j],mode);
         }
     }
-    layers[index1].setDataMatrix(dataSrc);
     if(!remove(index2))return false;
     return true; 
+}
+
+//handle the different size merge
+bool RS::BasicImage::mergeLayerCoreDiff(const uint16_t index1,const uint16_t index2,
+                                        blendMode mode,uint16_t row,uint16_t column){
+    uint16_t srcWidth=layers[index1].getWidth();
+    uint16_t srcLength=layers[index1].getLength();
+    uint16_t dstWidth=layers[index2].getWidth();
+    uint16_t dstLength=layers[index2].getLength();
+    uint16_t newWidth=std::max(srcWidth,(uint16_t)(row+dstWidth));
+    uint16_t newLength=std::max(srcLength,(uint16_t)(column+dstLength));
+    pointMatrix newMatrix(newWidth,rowPoint(newLength));
+    for(int i=0;i<srcWidth;++i){
+        for(int j=0;j<srcLength;++j){
+            newMatrix[i][j].reInit()
+        }
+    }
+    
 }
 
 
