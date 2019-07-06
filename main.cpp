@@ -144,6 +144,7 @@ int main()
 
     RS::BasicLayer l1(haha);
     l1.setLayerName("dude1");
+    l1.displayData();
     RS::BasicLayer l2(gaga);
     l2.setLayerName("dude2");
     RS::BasicLayer l3(caca);

@@ -55,7 +55,7 @@ BasicPoint& RS::BasicPoint::blend(const BasicPoint& dst,blendMode mode){
     //restore the RGB without the pre-multi of the Alpha
     this->red=this->red/newAlpha;
     this->green=this->green/newAlpha;
-    this->blue=this->green/newAlpha;
+    this->blue=this->blue/newAlpha;
     //restore the new Alpah
     this->alpha=newAlpha*255.0;
     return *this;
