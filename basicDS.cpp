@@ -46,8 +46,19 @@ BasicPoint& RS::BasicPoint::blend(const BasicPoint& dst,blendMode mode){
     std::pair<double,double> factor=getFactor(mode,As,Ad);
     double Fs=factor.first;
     double Fd=factor.second;
-    this->red=
-    //TODO
+    //calculate the new RGB
+    this->red=this->red*As*Fs+dst.getRed()*Ad*Fd;
+    this->green=this->green*As*Fs+dst.getGreen()*Ad*Fd;
+    this->blue=this->blue*As*Fs+dst.getBlue()*Ad*Fd;
+    //calculate the new Alpha
+    double newAlpha=As*Fs+Ad*Fd;
+    //restore the RGB without the pre-multi of the Alpha
+    this->red=this->red/newAlpha;
+    this->green=this->green/newAlpha;
+    this->blue=this->green/newAlpha;
+    //restore the new Alpah
+    this->alpha=newAlpha*255.0;
+    return *this;
 }
 
 uint32_t RS::BasicPoint::getUint32() const{
@@ -557,26 +568,34 @@ bool RS::BasicImage::taylor(const uint16_t index,const std::vector<uint16_t>& ar
     return false;
 }
 
-bool RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2){
+bool RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2,blendMode mode){
     uint16_t index1=findByName(name1);
     uint16_t index2=findByName(name2);
-    if(mergeLayer(index1,index2))return true;
+    if(mergeLayer(index1,index2,mode))return true;
     return false;
 }
-bool RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2){
+bool RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2,blendMode mode){
     checkFit(index1,index2);
-    if(mergeLayerCore(index1,index2))return true;
+    if(mergeLayerCore(index1,index2,mode))return true;
     return false;
 }
 
 //--------------------------------------------------------------------
 //-------------------------BasicImage_private-------------------------
 //--------------------------------------------------------------------
-bool RS::BasicImage::mergeLayerCore(const uint16_t index1,const uint16_t index2){
-    //TODO
-    //TODO
-    //TODO
-    //!!!!!!!!!!!!!!!
+bool RS::BasicImage::mergeLayerCore(const uint16_t index1,const uint16_t index2,blendMode mode){
+    uint16_t width=layers[index1].getWidth();
+    uint16_t length=layers[index1].getLength();
+    pointMatrix dataSrc=layers[index1].getDataMatrix();
+    pointMatrix dataDst=layers[index2].getDataMatrix();
+    for(int i=0;i<width;++i){
+        for(int j=0;j<length;++j){
+            dataSrc[i][j].blend(dataDst[i][j],mode);
+        }
+    }
+    layers[index1].setDataMatrix(dataSrc);
+    if(!remove(index2))return false;
+    return true; 
 }
 
 
@@ -601,53 +620,6 @@ int16_t RS::BasicImage::findByName(const std::string& name){
     return nameToIndex[name];
 }
 
-std::pair<double,double> RS::BasicImage::getFactor(blendMode mode,double As,double Ad){
-    //maybe init a hash table then the performance will change
-    //test the output time of the image and maybe make the change
-    switch (mode)
-    {
-        case CLEAR:
-            return {0,0};
-            break;
-        case SRC:
-            return {1,0};
-            break;
-        case DST:
-            return {0,1};
-            break;
-        case SRC_OVER:
-            return {1,1-As};
-            break;
-        case DST_OVER:
-            return {1-Ad,1};
-            break;
-        case SRC_IN:
-            return {Ad,0};
-            break;
-        case DST_IN:
-            return {0,As};
-            break;
-        case SRC_OUT:
-            return {1-Ad,0};
-            break;
-        case DST_OUT:
-            return {0,1-As};
-            break;
-        case SRC_ATOP:
-            return {Ad,1-As};
-            break;
-        case DST_ATOP:
-            return {1-Ad,As};
-            break;
-        case XOR:
-            return {1-Ad,1-As};
-            break;
-        default:
-            err("Unknow blend mode\n");
-            return {-1,-1};
-            break;
-    }
-}
 
 
 

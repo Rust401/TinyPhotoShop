@@ -142,16 +142,14 @@ public:
     virtual bool taylor(const std::string& name,const std::vector<uint16_t>& array);
     virtual bool taylor(const uint16_t index,const std::vector<uint16_t>& array);
 
-    virtual bool mergeLayer(const std::string& name1,const std::string& name2);
-    virtual bool mergeLayer(const uint16_t index1,const uint16_t index2);
+    virtual bool mergeLayer(const std::string& name1,const std::string& name2,blendMode mode);
+    virtual bool mergeLayer(const uint16_t index1,const uint16_t index2,blendMode mode);
 private:
-    virtual bool mergeLayerCore(const uint16_t index1,const uint16_t index2);
+    virtual bool mergeLayerCore(const uint16_t index1,const uint16_t index2,blendMode mode);
     virtual bool checkFit(const uint16_t index1,const uint16_t index2);
     virtual bool indexOK(const uint16_t index);
     virtual int16_t findByName(const std::string& name);
 
-    //waiting to decide if we want add the function here
-    virtual std::pair<double,double> getFactor(blendMode mode,double As,double Ad);
 };
 }
 
