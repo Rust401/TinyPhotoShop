@@ -32,8 +32,10 @@ public:
     BasicPoint(const uint8_t red, const uint8_t green, const uint8_t blue,
         const uint8_t alpha=0):red(red),green(green),blue(blue),alpha(alpha){}
     BasicPoint(const uint32_t data);//use a uint32 to initial
+    BasicPoint(const BasicPoint& p);
     virtual ~BasicPoint(){};
     virtual void reInit();
+    virtual void reInit(const BasicPoint& P);
     virtual void reInit(const uint32_t data);
     virtual void display();
     
@@ -144,13 +146,16 @@ public:
     virtual bool taylor(const std::string& name,const std::vector<uint16_t>& array);
     virtual bool taylor(const uint16_t index,const std::vector<uint16_t>& array);
 
-    virtual bool mergeLayer(const std::string& name1,const std::string& name2,blendMode mode);
-    virtual bool mergeLayer(const uint16_t index1,const uint16_t index2,blendMode mode);
+    virtual bool mergeLayer(const std::string& name1,const std::string& name2,blendMode mode,
+                            uint16_t row=0,uint16_t column=0);
+    virtual bool mergeLayer(const uint16_t index1,const uint16_t index2,blendMode mode,
+                            uint16_t row=0,uint16_t column=0);
 private:
     virtual bool mergeLayerCore(const uint16_t index1,const uint16_t index2,blendMode mode);
     virtual bool mergeLayerCoreDiff(const uint16_t index1,const uint16_t index2,
                                     blendMode mode,uint16_t row=0,uint16_t column=0);
     virtual bool checkFit(const uint16_t index1,const uint16_t index2);
+    virtual bool checkSameSize(const uint16_t index1,const uint16_t index2);
     virtual bool indexOK(const uint16_t index);
     virtual int16_t findByName(const std::string& name);
 

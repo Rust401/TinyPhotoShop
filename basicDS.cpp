@@ -15,10 +15,7 @@ RS::BasicPoint::BasicPoint(const uint32_t data)
 
 RS::BasicPoint::BasicPoint(const BasicPoint& p)
 {
-    this->red=p.getRed();
-    this->green=p.getGreen();
-    this->blue=p.getBlue();
-    this->alpha=p.getAlpha();
+    reInit(p);
 }
 
 
@@ -33,6 +30,13 @@ void RS::BasicPoint::reInit(){
 void RS::BasicPoint::reInit(const uint32_t data){
     uint8_t* p=(uint8_t*)&data;
     red=*p;green=*(p+1);blue=*(p+2);alpha=*(p+3);
+}
+
+void RS::BasicPoint::reInit(const BasicPoint& p){
+    this->red=p.getRed();
+    this->green=p.getGreen();
+    this->blue=p.getBlue();
+    this->alpha=p.getAlpha();
 }
 
 void RS::BasicPoint::display(){
@@ -579,15 +583,21 @@ bool RS::BasicImage::taylor(const uint16_t index,const std::vector<uint16_t>& ar
     return false;
 }
 
-bool RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2,blendMode mode){
+bool RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2,blendMode mode,
+                                uint16_t row,uint16_t column){
     uint16_t index1=findByName(name1);
     uint16_t index2=findByName(name2);
-    if(mergeLayer(index1,index2,mode))return true;
+    if(mergeLayer(index1,index2,mode,row,column))return true;
     return false;
 }
-bool RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2,blendMode mode){
-    checkFit(index1,index2);
-    if(mergeLayerCore(index1,index2,mode))return true;
+bool RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2,blendMode mode,
+                                uint16_t row,uint16_t column){
+    if(!checkFit(index1,index2))return false;
+    if(checkSameSize(index1,index2)){
+        if(mergeLayerCore(index1,index2,mode))return true;
+    }else{
+        if(mergeLayerCoreDiff(index1,index2,mode,row,column))return true;
+    }
     return false;
 }
 
@@ -618,21 +628,42 @@ bool RS::BasicImage::mergeLayerCoreDiff(const uint16_t index1,const uint16_t ind
     uint16_t dstLength=layers[index2].getLength();
     uint16_t newWidth=std::max(srcWidth,(uint16_t)(row+dstWidth));
     uint16_t newLength=std::max(srcLength,(uint16_t)(column+dstLength));
+
+    pointMatrix& srcPointMatrix=layers[index1].getDataMatrix();
+    pointMatrix& dstPointMatrix=layers[index2].getDataMatrix();
+
     pointMatrix newMatrix(newWidth,rowPoint(newLength));
     for(int i=0;i<srcWidth;++i){
         for(int j=0;j<srcLength;++j){
-            newMatrix[i][j].reInit()
+            newMatrix[i][j].reInit(srcPointMatrix[i][j]);
         }
     }
-    
+    for(int i=row;i<newWidth;++i){
+        for(int j=column;j<newLength;++j){
+            if(row<srcWidth&&column<srcLength){
+                newMatrix[i][j].blend(dstPointMatrix[i][j],mode);
+            }else{
+                newMatrix[i][j].reInit(dstPointMatrix[i][j]);
+            }
+        }
+    }
+    layers[index1].setDataMatrix(newMatrix);
+    if(!remove(index2))return false;
+    return true;
 }
 
 
 bool RS::BasicImage::checkFit(const uint16_t index1,const uint16_t index2){
     if(!indexOK(index1)||!indexOK(index2))return false;
-    RS::BasicLayer l1=layers[index1];
-    RS::BasicLayer l2=layers[index2];
+    RS::BasicLayer& l1=layers[index1];
+    RS::BasicLayer& l2=layers[index2];
     if(!l1.haveSize()||!l2.haveSize())return false;
+    return true;
+}
+
+bool RS::BasicImage::checkSameSize(const uint16_t index1,const uint16_t index2){
+    RS::BasicLayer& l1=layers[index1];
+    RS::BasicLayer& l2=layers[index2];
     if(l1.getWidth()!=l2.getWidth()||l1.getLength()!=l2.getLength())return false;
     return true;
 }
