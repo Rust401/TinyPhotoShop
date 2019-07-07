@@ -10,10 +10,16 @@
 #include <memory.h>
 #include <unordered_map>
 #include <math.h>
+#include <algorithm>
 
 #define pointMatrix std::vector<std::vector<RS::BasicPoint>>
 #define dataBuffer std::vector<std::vector<uint32_t>>
 #define rowData std::vector<uint32_t>
+#define rowPoint std::vector<RS::BasicPoint>
+
+enum blendMode {
+    CLEAR,SRC,DST,SRC_OVER,DST_OVER,SRC_IN,SRC_OUT,DST_IN,DST_OUT,SRC_ATOP,DST_ATOP,XOR
+};
 
 namespace RS
 {
@@ -26,8 +32,10 @@ public:
     BasicPoint(const uint8_t red, const uint8_t green, const uint8_t blue,
         const uint8_t alpha=0):red(red),green(green),blue(blue),alpha(alpha){}
     BasicPoint(const uint32_t data);//use a uint32 to initial
+    BasicPoint(const BasicPoint& p);
     virtual ~BasicPoint(){};
     virtual void reInit();
+    virtual void reInit(const BasicPoint& P);
     virtual void reInit(const uint32_t data);
     virtual void display();
     
@@ -41,6 +49,9 @@ public:
     virtual void setGreen(const uint8_t green){this->green=green;}
     virtual void setBlue(const uint8_t blue){this->blue=blue;}
     virtual void setAlpha(const uint8_t alpha){this->alpha=alpha;}
+
+    virtual std::pair<double,double> getFactor(blendMode mode,double As,double Ad);
+    BasicPoint& blend(const BasicPoint& dst,blendMode mode);
 
     BasicPoint& operator=(const BasicPoint& p);
 };
@@ -71,6 +82,8 @@ public:
     virtual void getDataBuffer(dataBuffer& result) const;
     virtual const std::string& getLayerName() const {return name;}
     virtual uint16_t getLayerNumber() const {return layerNumber;}
+    virtual uint16_t getWidth() const;
+    virtual uint16_t getLength() const;
     virtual bool isValid() const {return Valid;}
     virtual bool haveSize() const;
 
@@ -89,8 +102,6 @@ public:
 
     virtual bool squareRotate();
     virtual bool rectangleRotate();
-
-    //virtual void rotateDude(int* a,int* b,int* c,int* d,pointMatrix& matrix);
     
     BasicLayer& operator=(const BasicLayer& layer);
 };
@@ -104,24 +115,13 @@ protected:
     uint16_t validLayer;
     uint16_t totalLayer;
     uint16_t current;
-    bool indexOK(const uint16_t index){return index>=0&&index<layers.size();}
 public:
     BasicImage();
     BasicImage(const BasicLayer& aLayer,const std::string& name="default");
-
     BasicImage(const uint16_t width,const uint16_t length, const std::string& name="default");
-    BasicImage(const dataBuffer& data){
-        const std::string& name="default";
-        uint16_t currentIndex=0;
-        validLayer=0;
-        totalLayer=0;
-        current=0;
-        RS::BasicLayer aLayer(data);
-        insert(aLayer);
-    }
-    ~BasicImage(){}
+    BasicImage(const dataBuffer& data);
+    virtual ~BasicImage(){}
 
-    
     virtual void reInit(const uint16_t width=0,const uint16_t length=0);
     virtual void display() const;
     virtual void displayHash() const;
@@ -146,8 +146,19 @@ public:
     virtual bool taylor(const std::string& name,const std::vector<uint16_t>& array);
     virtual bool taylor(const uint16_t index,const std::vector<uint16_t>& array);
 
-    virtual void mergeLayer(const std::string& name1,const std::string& name2);
-    virtual void mergeLayer(const uint16_t index1,const uint16_t index2);
+    virtual bool mergeLayer(const std::string& name1,const std::string& name2,blendMode mode,
+                            uint16_t row=0,uint16_t column=0);
+    virtual bool mergeLayer(const uint16_t index1,const uint16_t index2,blendMode mode,
+                            uint16_t row=0,uint16_t column=0);
+private:
+    virtual bool mergeLayerCore(const uint16_t index1,const uint16_t index2,blendMode mode);
+    virtual bool mergeLayerCoreDiff(const uint16_t index1,const uint16_t index2,
+                                    blendMode mode,uint16_t row=0,uint16_t column=0);
+    virtual bool checkFit(const uint16_t index1,const uint16_t index2);
+    virtual bool checkSameSize(const uint16_t index1,const uint16_t index2);
+    virtual bool indexOK(const uint16_t index);
+    virtual int16_t findByName(const std::string& name);
+
 };
 }
 

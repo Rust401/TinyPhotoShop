@@ -1,8 +1,8 @@
-#ifndef UTILS_HPP
-#define UTILS_HPP
+#ifndef UTILS_H
+#define UTILS_H
 #include <string>
 #include <iostream>
 
 void err(const std::string& str);
 
-#endif
+#endif //UTILS_H

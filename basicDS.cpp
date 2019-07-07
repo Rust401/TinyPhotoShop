@@ -1,5 +1,6 @@
 #include "basicDS.h"
 #include "utils.h"
+#include <cmath>
 using namespace RS;
 
 //----------------------------------
@@ -12,6 +13,13 @@ RS::BasicPoint::BasicPoint(const uint32_t data)
     reInit(data);
 }
 
+RS::BasicPoint::BasicPoint(const BasicPoint& p)
+{
+    reInit(p);
+}
+
+
+
 void RS::BasicPoint::reInit(){
     red=0;
     green=0;
@@ -22,6 +30,13 @@ void RS::BasicPoint::reInit(){
 void RS::BasicPoint::reInit(const uint32_t data){
     uint8_t* p=(uint8_t*)&data;
     red=*p;green=*(p+1);blue=*(p+2);alpha=*(p+3);
+}
+
+void RS::BasicPoint::reInit(const BasicPoint& p){
+    this->red=p.getRed();
+    this->green=p.getGreen();
+    this->blue=p.getBlue();
+    this->alpha=p.getAlpha();
 }
 
 void RS::BasicPoint::display(){
@@ -38,6 +53,29 @@ BasicPoint& RS::BasicPoint::operator=(const BasicPoint& p){
     return *this;
 }
 
+BasicPoint& RS::BasicPoint::blend(const BasicPoint& dst,blendMode mode){
+    uint8_t AsInt=this->alpha;
+    uint8_t AdInt=dst.alpha;
+    double As=AsInt/255.0;
+    double Ad=AdInt/255.0;
+    std::pair<double,double> factor=getFactor(mode,As,Ad);
+    double Fs=factor.first;
+    double Fd=factor.second;
+    //calculate the new RGB
+    this->red=this->red*As*Fs+dst.getRed()*Ad*Fd;
+    this->green=this->green*As*Fs+dst.getGreen()*Ad*Fd;
+    this->blue=this->blue*As*Fs+dst.getBlue()*Ad*Fd;
+    //calculate the new Alpha
+    double newAlpha=As*Fs+Ad*Fd;
+    //restore the RGB without the pre-multi of the Alpha
+    this->red=this->red/newAlpha;
+    this->green=this->green/newAlpha;
+    this->blue=this->blue/newAlpha;
+    //restore the new Alpah
+    this->alpha=newAlpha*255.0;
+    return *this;
+}
+
 uint32_t RS::BasicPoint::getUint32() const{
     uint32_t result;
     uint8_t* p=(uint8_t*)&result;
@@ -48,6 +86,51 @@ uint32_t RS::BasicPoint::getUint32() const{
     return result;
 }
 
+std::pair<double,double> RS::BasicPoint::getFactor(blendMode mode,double As,double Ad){
+    switch (mode)
+    {
+        case CLEAR:
+            return {0,0};
+            break;
+        case SRC:
+            return {1,0};
+            break;
+        case DST:
+            return {0,1};
+            break;
+        case SRC_OVER:
+            return {1,1-As};
+            break;
+        case DST_OVER:
+            return {1-Ad,1};
+            break;
+        case SRC_IN:
+            return {Ad,0};
+            break;
+        case DST_IN:
+            return {0,As};
+            break;
+        case SRC_OUT:
+            return {1-Ad,0};
+            break;
+        case DST_OUT:
+            return {0,1-As};
+            break;
+        case SRC_ATOP:
+            return {Ad,1-As};
+            break;
+        case DST_ATOP:
+            return {1-Ad,As};
+            break;
+        case XOR:
+            return {1-Ad,1-As};
+            break;
+        default:
+            err("Unknow blend mode\n");
+            return {-1,-1};
+            break;
+    }
+}
 
 //----------------------------------
 //--------BasicLayer----------------
@@ -112,6 +195,16 @@ bool RS::BasicLayer::haveSize() const{
     if(datamatrix.size()==0)return false;
     if(datamatrix[0].size()==0)return false;
     return true;
+}
+
+uint16_t RS::BasicLayer::getWidth() const{
+    if(haveSize())return datamatrix.size();
+    else return 0;
+}
+
+uint16_t RS::BasicLayer::getLength() const{
+    if(haveSize())return datamatrix[0].size();
+    else return 0;
 }
 
 void RS::BasicLayer::setDataMatrix(const dataBuffer& data){
@@ -290,6 +383,16 @@ RS::BasicImage::BasicImage(const uint16_t width,const uint16_t length,const std:
     totalLayer=0;
     current=0;
     RS::BasicLayer aLayer(width,length);
+    insert(aLayer);
+}
+
+RS::BasicImage::BasicImage(const dataBuffer& data){
+    const std::string& name="default";
+    uint16_t currentIndex=0;
+    validLayer=0;
+    totalLayer=0;
+    current=0;
+    RS::BasicLayer aLayer(data);
     insert(aLayer);
 }
 
@@ -480,12 +583,103 @@ bool RS::BasicImage::taylor(const uint16_t index,const std::vector<uint16_t>& ar
     return false;
 }
 
-void RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2){
-    
+bool RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name2,blendMode mode,
+                                uint16_t row,uint16_t column){
+    uint16_t index1=findByName(name1);
+    uint16_t index2=findByName(name2);
+    if(mergeLayer(index1,index2,mode,row,column))return true;
+    return false;
 }
-void RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2){
-    
+bool RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2,blendMode mode,
+                                uint16_t row,uint16_t column){
+    if(!checkFit(index1,index2))return false;
+    if(checkSameSize(index1,index2)){
+        if(mergeLayerCore(index1,index2,mode))return true;
+    }else{
+        if(mergeLayerCoreDiff(index1,index2,mode,row,column))return true;
+    }
+    return false;
 }
+
+//--------------------------------------------------------------------
+//-------------------------BasicImage_private-------------------------
+//--------------------------------------------------------------------
+bool RS::BasicImage::mergeLayerCore(const uint16_t index1,const uint16_t index2,blendMode mode){
+    uint16_t width=layers[index1].getWidth();
+    uint16_t length=layers[index1].getLength();
+    //direct modigy the layerdata, no need to build a new matrix and reset the layer
+    pointMatrix& dataSrc=layers[index1].getDataMatrix();
+    pointMatrix& dataDst=layers[index2].getDataMatrix();
+    for(int i=0;i<width;++i){
+        for(int j=0;j<length;++j){
+            dataSrc[i][j].blend(dataDst[i][j],mode);
+        }
+    }
+    if(!remove(index2))return false;
+    return true; 
+}
+
+//handle the different size merge
+bool RS::BasicImage::mergeLayerCoreDiff(const uint16_t index1,const uint16_t index2,
+                                        blendMode mode,uint16_t row,uint16_t column){
+    uint16_t srcWidth=layers[index1].getWidth();
+    uint16_t srcLength=layers[index1].getLength();
+    uint16_t dstWidth=layers[index2].getWidth();
+    uint16_t dstLength=layers[index2].getLength();
+    uint16_t newWidth=std::max(srcWidth,(uint16_t)(row+dstWidth));
+    uint16_t newLength=std::max(srcLength,(uint16_t)(column+dstLength));
+
+    pointMatrix& srcPointMatrix=layers[index1].getDataMatrix();
+    pointMatrix& dstPointMatrix=layers[index2].getDataMatrix();
+
+    pointMatrix newMatrix(newWidth,rowPoint(newLength));
+    for(int i=0;i<srcWidth;++i){
+        for(int j=0;j<srcLength;++j){
+            newMatrix[i][j].reInit(srcPointMatrix[i][j]);
+        }
+    }
+    for(int i=row;i<row+dstWidth;++i){
+        for(int j=column;j<column+dstLength;++j){
+            if(i<srcWidth&&j<srcLength){
+                newMatrix[i][j].blend(dstPointMatrix[i-row][j-column],mode);
+            }else{
+                newMatrix[i][j].reInit(dstPointMatrix[i-row][j-column]);
+            }
+        }
+    }
+    layers[index1].setDataMatrix(newMatrix);
+    if(!remove(index2))return false;
+    return true;
+}
+
+
+bool RS::BasicImage::checkFit(const uint16_t index1,const uint16_t index2){
+    if(!indexOK(index1)||!indexOK(index2))return false;
+    RS::BasicLayer& l1=layers[index1];
+    RS::BasicLayer& l2=layers[index2];
+    if(!l1.haveSize()||!l2.haveSize())return false;
+    return true;
+}
+
+bool RS::BasicImage::checkSameSize(const uint16_t index1,const uint16_t index2){
+    RS::BasicLayer& l1=layers[index1];
+    RS::BasicLayer& l2=layers[index2];
+    if(l1.getWidth()!=l2.getWidth()||l1.getLength()!=l2.getLength())return false;
+    return true;
+}
+
+bool RS::BasicImage::indexOK(const uint16_t index){
+    return index>=0&&index<layers.size();
+}
+
+int16_t RS::BasicImage::findByName(const std::string& name){
+    if(!nameToIndex.count(name)){
+        err("No such layer name1\n");
+        return -1;
+    }
+    return nameToIndex[name];
+}
+
 
 
 

@@ -1,16 +1,20 @@
+//#define TEST1
+#define TEST2
+//#define TEST3
 #include "basicDS.h"
+
 
 void foo(RS::BasicLayer& srcs){
     pointMatrix data(110,std::vector<RS::BasicPoint>(1200));
     srcs.setDataMatrix(data);
 }
 
-
+#ifdef TEST1
 int main()
 {
     //The test matir
     dataBuffer haha(1024,rowData(1024,0xffffffff));
-    dataBuffer baba={{0x11111111,0x22222222,0xffffffff},
+    dataBuffer baba={{0x1f2f3f4f,0x22222222,0xffffffff},
                      {0x33333333,0x44444444,0x3f3f3f3f},
                      {0x11111111,0x22222222,0xffffffff},
                      {0x33333333,0x44444444,0x3f3f3f3f}};
@@ -123,7 +127,55 @@ int main()
 
     
     //show the whole info of the image
-    img.display();
-        
-
+    img.display();     
 }
+#endif
+
+#ifdef TEST2
+int main()
+{
+    dataBuffer haha(8,rowData(8,0x64646464));
+    dataBuffer gaga(6,rowData(6,0x28282828));
+    dataBuffer baba={{0x1f2f3f4f,0x22222222,0xffffffff},
+                     {0x33333333,0x44444444,0x3f3f3f3f},
+                     {0x11111111,0x22222222,0xffffffff},
+                     {0x33333333,0x44444444,0x3f3f3f3f}};
+    dataBuffer caca(2048,rowData(2048,0x3f3f3f3f));
+
+    RS::BasicLayer l1(haha);
+    l1.setLayerName("dude1");
+    l1.displayData();
+    RS::BasicLayer l2(gaga);
+    l2.setLayerName("dude2");
+    RS::BasicLayer l3(caca);
+    l3.setLayerName("dude3");
+    RS::BasicLayer l4(baba);
+    l4.setLayerName("dude4");
+
+    RS::BasicImage img;
+    img.insert(l1);
+    img.insert(l2);
+    img.insert(l3);
+    img.insert(l4);
+    
+
+    img.mergeLayer("dude1","dude2",SRC_OVER,8,8);
+    RS::BasicLayer pick=img.getLayer(0);
+    pick.displayData();
+
+    img.display();
+    img.displayHash();
+}
+#endif
+
+#ifdef TEST3
+int main()
+{
+    for(int i=0;i<=XOR;++i){
+        RS::BasicPoint p1(100,100,100,100);
+        RS::BasicPoint p2(50,50,50,100);
+        p1.blend(p2,(blendMode)i);
+        p1.display();
+    }
+}
+#endif
