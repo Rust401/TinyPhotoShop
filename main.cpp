@@ -134,8 +134,8 @@ int main()
 #ifdef TEST2
 int main()
 {
-    dataBuffer haha(5,rowData(5,0x64646464));
-    dataBuffer gaga(5,rowData(5,0x28282828));
+    dataBuffer haha(8,rowData(8,0x64646464));
+    dataBuffer gaga(6,rowData(6,0x28282828));
     dataBuffer baba={{0x1f2f3f4f,0x22222222,0xffffffff},
                      {0x33333333,0x44444444,0x3f3f3f3f},
                      {0x11111111,0x22222222,0xffffffff},
@@ -159,7 +159,7 @@ int main()
     img.insert(l4);
     
 
-    img.mergeLayer("dude1","dude2",SRC_OVER);
+    img.mergeLayer("dude1","dude2",SRC_OVER,8,8);
     RS::BasicLayer pick=img.getLayer(0);
     pick.displayData();
 

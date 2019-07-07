@@ -638,12 +638,12 @@ bool RS::BasicImage::mergeLayerCoreDiff(const uint16_t index1,const uint16_t ind
             newMatrix[i][j].reInit(srcPointMatrix[i][j]);
         }
     }
-    for(int i=row;i<newWidth;++i){
-        for(int j=column;j<newLength;++j){
-            if(row<srcWidth&&column<srcLength){
-                newMatrix[i][j].blend(dstPointMatrix[i][j],mode);
+    for(int i=row;i<row+dstWidth;++i){
+        for(int j=column;j<column+dstLength;++j){
+            if(i<srcWidth&&j<srcLength){
+                newMatrix[i][j].blend(dstPointMatrix[i-row][j-column],mode);
             }else{
-                newMatrix[i][j].reInit(dstPointMatrix[i][j]);
+                newMatrix[i][j].reInit(dstPointMatrix[i-row][j-column]);
             }
         }
     }
