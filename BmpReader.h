@@ -37,15 +37,18 @@ struct bmpInfoHead {
 };
 
 class Bmp {
-public:
+private:
 	void Print(bmpFileHead *p);
 	void Print(bmpInfoHead *p);
 	void WriteFileHead(bmpFileHead **H, MATRIX* layer,int x);
 	void WriteInfoHead(bmpInfoHead **I, MATRIX* layer,int x);
 	void ReadFileHead(bmpFileHead *H,char **buffer);
 	void ReadInfoHead(bmpInfoHead *I,char **buffer);
+public:
 	MATRIX* BmpRead(const char *Filename);
 	void BmpWrite(MATRIX* layer,const char *Filename);
 };
+
+#pragma pack()
 
 #endif //BMP_READER_H

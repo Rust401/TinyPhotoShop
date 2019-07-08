@@ -173,11 +173,12 @@ int main()
 
     l5.leftRotate();
     l5.setLayerName("dude6");
+    //l5.displayData();
     img.insert(l5);
     img.displayHash();
     
 
-    img.mergeLayer("dude5","dude6",SRC_IN,300,200);
+    img.mergeLayer("dude5","dude6", SRC_OVER,100,100);
     img.displayHash();
     RS::BasicLayer pick=img.getLayer(0);
     //pick.displayData();

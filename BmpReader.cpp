@@ -37,7 +37,7 @@ MATRIX* Bmp::BmpRead(const char *Filename) {
 			*t = *(buffer + 2);//R
 			*(t + 1) = *(buffer + 1);//G
 			*(t + 2) = *(buffer);//B
-			*(t + 3) = (uint8_t)0;//Alpha
+			*(t + 3) = (uint8_t)125;//Alpha
 			buffer = buffer + 3;
 			(*res)[i][j] = tmp;
 		}
@@ -75,20 +75,11 @@ void Bmp::BmpWrite(MATRIX* layer,const char* Filename) {
 		err("empty file name.");
 		return;
 	}
-/* 	fp=fopen(Filename, "r");
-	if (fp) {
-		err("filename already used");
-		return;
-	} */
     fp=fopen(Filename,"wb");
     if(fp==nullptr){
         err("open failed.");
         return;
     }
-	/* if (err = fopen_s(&fp,Filename, "wb")!=0) {
-		std::cout << "crate file failed" << std::endl;
-		return;
-	} */
 	//if the file can be opened
 	char *buffer = new char[MAXSIZE];
 	char *BHead = buffer;
