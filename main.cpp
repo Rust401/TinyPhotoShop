@@ -7,8 +7,6 @@
 #include "basicDS.h"
 #include "BmpReader.h"
 
-
-
 #ifdef TEST1
 int main()
 {
@@ -218,10 +216,11 @@ int main()
     l1.rightRotate();
 
     matrix=reader2.BmpRead("src/lena.bmp");
-    writer.BmpWrite(matrix,"test2.bmp");
     RS::BasicLayer l2(*matrix);
     l2.setLayerName("dude2");
     l2.upDownReverse();
+    writer.BmpWrite(matrix,"test2.bmp");
+    
 
     matrix=reader3.BmpRead("src/sails.bmp");
     writer.BmpWrite(matrix,"test3.bmp");

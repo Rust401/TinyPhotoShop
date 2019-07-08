@@ -331,6 +331,7 @@ bool RS::BasicLayer::leftRightReverse(){
     return false;
 }
 
+//maybe bug here, check the bug!
 bool RS::BasicLayer::taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_t columnE){
     if(datamatrix.size()==0)return false;
     if(datamatrix[0].size()==0)return false;
@@ -353,6 +354,12 @@ bool RS::BasicLayer::taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_
     Valid=newValid;
     return true;
 }
+
+bool RS::BasicLayer::writeToFile(const std::string& fileName){
+    
+}
+
+
 
 
 //----------------------------------
