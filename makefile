@@ -1,12 +1,9 @@
 all: ds
 
 ds: clean
-	g++ -g -std=c++11 -o backend main.cpp basicDS.cpp utils.cpp BmpReader.cpp
-	./backend
-
-png: clean
-	clang++ -std=c++11 -o  bmp utils.cpp BmpReader.cpp main.cpp
-	./bmp
+	clang++ -g -std=c++11 -o backend main.cpp basicDS.cpp utils.cpp BmpReader.cpp
+	mv backend bin/
+	bin/backend
 
 clean:
-	rm -f backend bmp
+	rm -f backend bmp test/*

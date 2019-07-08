@@ -1,7 +1,7 @@
 //#define TEST1
-#define TEST2
+//#define TEST2
 //#define TEST3
-//#define BMP_TEST
+#define BMP_TEST
 
 
 #include "basicDS.h"
@@ -136,7 +136,7 @@ int main()
 {
     Bmp reader;
     Bmp writer;
-    MATRIX* p=reader.BmpRead("lena.bmp");
+    MATRIX* p=reader.BmpRead("resource/lena.bmp");
     dataBuffer lenaBuffer=*p;
 
     RS::BasicLayer l5(lenaBuffer);
@@ -186,12 +186,10 @@ int main()
     dataBuffer result;
     pick.getDataBuffer(result);
 
-
     img.display();
 
     writer.BmpWrite(&result,"test.bmp");
-
-    
+    system("mv test.bmp test/");
 }
 #endif
 
@@ -210,25 +208,36 @@ int main()
 #ifdef BMP_TEST
 int main()
 {
-    Bmp reader;
-    MATRIX* matrix=reader.BmpRead("lena.bmp");
-    #pragma pack(4)
+    Bmp reader1,reader2,reader3;
+    Bmp writer;
 
+    MATRIX* matrix=reader1.BmpRead("src/mountain.bmp");
+    writer.BmpWrite(matrix,"test1.bmp");
     RS::BasicLayer l1(*matrix);
     l1.setLayerName("dude1");
     l1.rightRotate();
-    //l1.reInit();
 
+    matrix=reader2.BmpRead("src/lena.bmp");
+    writer.BmpWrite(matrix,"test2.bmp");
     RS::BasicLayer l2(*matrix);
     l2.setLayerName("dude2");
     l2.upDownReverse();
-    l2.taylor(20,20,60,60);
-    l2.displayData();
 
+    matrix=reader3.BmpRead("src/sails.bmp");
+    writer.BmpWrite(matrix,"test3.bmp");
+    RS::BasicLayer l3(*matrix);
+    l3.setLayerName("dude3");
 
-    dataBuffer data(41,rowData(41,0x28282828));
-    l1.getDataBuffer(data);
+    RS::BasicImage img;
+    img.insert(l1);
+    img.insert(l2);
+    img.insert(l3);
 
-    reader.BmpWrite(&data,"newLena.bmp");
+    RS::BasicLayer& tmp=img.getLayer("dude3");
+    dataBuffer data;
+    tmp.getDataBuffer(data);
+    
+    //writer.BmpWrite(&data,"test.bmp");
+    //system("sudo mv test.bmp /test");
 }
 #endif
