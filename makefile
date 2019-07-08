@@ -1,24 +1,9 @@
-all: t
+all: ds
 
-point: clean
-	clang++ -std=c++11 -o point PointTest.cpp
-	./point
-
-layer: clean
-	clang++ -std=c++11 -o layer LayerTest.cpp
-	./layer
-
-image: clean
-	clang++ -std=c++11 -o image ImageTest.cpp
-	./image
-
-t: clean
-	clang++ -std=c++11 -o tt main.cpp basicDS.cpp utils.cpp
-	./tt
-
-png: clean
-	clang++ -std=c++11 -o  png pngRead.cpp
-	./png
+ds: clean
+	clang++ -g -std=c++11 -o backend main.cpp basicDS.cpp utils.cpp BmpReader.cpp
+	mv backend bin/
+	bin/backend
 
 clean:
-	rm -f point layer image tt
+	rm -f backend bmp test/*

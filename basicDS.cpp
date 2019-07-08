@@ -170,7 +170,7 @@ void RS::BasicLayer::reInit(const dataBuffer& data){
 }
 
 void RS::BasicLayer::display(){
-    printf("DataMatrix:  %p\n",&datamatrix);
+    printf("DataMatrix:  %p\n",&this->datamatrix);
     printf("Name:        %s\n",name.c_str());
     printf("LayerNumber: %d\n",layerNumber);
     printf("Valid:       %d\n",(int16_t)Valid);
@@ -593,7 +593,7 @@ bool RS::BasicImage::mergeLayer(const std::string& name1,const std::string& name
 bool RS::BasicImage::mergeLayer(const uint16_t index1,const uint16_t index2,blendMode mode,
                                 uint16_t row,uint16_t column){
     if(!checkFit(index1,index2))return false;
-    if(checkSameSize(index1,index2)){
+    if(checkSameSize(index1,index2)&&row==0&&column==0){
         if(mergeLayerCore(index1,index2,mode))return true;
     }else{
         if(mergeLayerCoreDiff(index1,index2,mode,row,column))return true;

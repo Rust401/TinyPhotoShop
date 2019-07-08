@@ -1,13 +1,13 @@
 //#define TEST1
-#define TEST2
+//#define TEST2
 //#define TEST3
+#define BMP_TEST
+
+
 #include "basicDS.h"
+#include "BmpReader.h"
 
 
-void foo(RS::BasicLayer& srcs){
-    pointMatrix data(110,std::vector<RS::BasicPoint>(1200));
-    srcs.setDataMatrix(data);
-}
 
 #ifdef TEST1
 int main()
@@ -134,8 +134,20 @@ int main()
 #ifdef TEST2
 int main()
 {
-    dataBuffer haha(8,rowData(8,0x64646464));
-    dataBuffer gaga(6,rowData(6,0x28282828));
+    Bmp reader;
+    Bmp writer;
+    MATRIX* p=reader.BmpRead("resource/lena.bmp");
+    dataBuffer lenaBuffer=*p;
+
+    RS::BasicLayer l5(lenaBuffer);
+    l5.setLayerName("dude5");
+
+    
+
+
+
+    dataBuffer haha(200,rowData(400,0x64646464));
+    dataBuffer gaga(300,rowData(800,0x28282828));
     dataBuffer baba={{0x1f2f3f4f,0x22222222,0xffffffff},
                      {0x33333333,0x44444444,0x3f3f3f3f},
                      {0x11111111,0x22222222,0xffffffff},
@@ -144,7 +156,7 @@ int main()
 
     RS::BasicLayer l1(haha);
     l1.setLayerName("dude1");
-    l1.displayData();
+    //l1.displayData();
     RS::BasicLayer l2(gaga);
     l2.setLayerName("dude2");
     RS::BasicLayer l3(caca);
@@ -153,18 +165,31 @@ int main()
     l4.setLayerName("dude4");
 
     RS::BasicImage img;
+    img.insert(l5);
     img.insert(l1);
     img.insert(l2);
     img.insert(l3);
     img.insert(l4);
+
+    l5.leftRotate();
+    l5.setLayerName("dude6");
+    //l5.displayData();
+    img.insert(l5);
+    img.displayHash();
     
 
-    img.mergeLayer("dude1","dude2",SRC_OVER,8,8);
+    img.mergeLayer("dude5","dude6", SRC_OVER,100,100);
+    img.displayHash();
     RS::BasicLayer pick=img.getLayer(0);
-    pick.displayData();
+    //pick.displayData();
+
+    dataBuffer result;
+    pick.getDataBuffer(result);
 
     img.display();
-    img.displayHash();
+
+    writer.BmpWrite(&result,"test.bmp");
+    system("mv test.bmp test/");
 }
 #endif
 
@@ -177,5 +202,42 @@ int main()
         p1.blend(p2,(blendMode)i);
         p1.display();
     }
+}
+#endif
+
+#ifdef BMP_TEST
+int main()
+{
+    Bmp reader1,reader2,reader3;
+    Bmp writer;
+
+    MATRIX* matrix=reader1.BmpRead("src/mountain.bmp");
+    writer.BmpWrite(matrix,"test1.bmp");
+    RS::BasicLayer l1(*matrix);
+    l1.setLayerName("dude1");
+    l1.rightRotate();
+
+    matrix=reader2.BmpRead("src/lena.bmp");
+    writer.BmpWrite(matrix,"test2.bmp");
+    RS::BasicLayer l2(*matrix);
+    l2.setLayerName("dude2");
+    l2.upDownReverse();
+
+    matrix=reader3.BmpRead("src/sails.bmp");
+    writer.BmpWrite(matrix,"test3.bmp");
+    RS::BasicLayer l3(*matrix);
+    l3.setLayerName("dude3");
+
+    RS::BasicImage img;
+    img.insert(l1);
+    img.insert(l2);
+    img.insert(l3);
+
+    RS::BasicLayer& tmp=img.getLayer("dude3");
+    dataBuffer data;
+    tmp.getDataBuffer(data);
+    
+    //writer.BmpWrite(&data,"test.bmp");
+    //system("sudo mv test.bmp /test");
 }
 #endif
