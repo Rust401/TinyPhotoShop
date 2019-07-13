@@ -8,7 +8,6 @@
 #include <iomanip>
 #include <string>
 #include <stddef.h>
-#include <error.h>
 #include <memory.h>
 
 #pragma pack(1)

@@ -6,4 +6,4 @@ ds: clean
 	bin/backend
 
 clean:
-	rm -f backend bmp test/* *.bmp
+	rm -f backend bmp test/* *.bmp bin/*
