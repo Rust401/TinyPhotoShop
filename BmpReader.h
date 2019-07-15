@@ -45,7 +45,7 @@ private:
 	void ReadInfoHead(bmpInfoHead *I,char **buffer);
 public:
 	MATRIX* BmpRead(const char *Filename);
-	void BmpWrite(MATRIX* layer,const char *Filename);
+	bool BmpWrite(MATRIX* layer,const char *Filename);
 };
 
 #pragma pack()

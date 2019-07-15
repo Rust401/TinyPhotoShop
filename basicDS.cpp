@@ -356,7 +356,10 @@ bool RS::BasicLayer::taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_
 }
 
 bool RS::BasicLayer::writeToFile(const std::string& fileName){
-    
+    Bmp writer;
+    dataBuffer outputData;
+    getDataBuffer(outputData);
+    return writer.BmpWrite(&outputData,fileName.c_str());
 }
 
 

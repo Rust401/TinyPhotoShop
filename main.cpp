@@ -1,7 +1,8 @@
 //#define TEST1
 //#define TEST2
 //#define TEST3
-#define BMP_TEST
+#define READ_WRITE_TEST
+//#define BMP_TEST
 
 
 #include "basicDS.h"
@@ -238,5 +239,17 @@ int main()
     
     //writer.BmpWrite(&data,"test.bmp");
     //system("sudo mv test.bmp /test");
+}
+#endif
+
+#ifdef READ_WRITE_TEST
+int main()
+{
+    Bmp reader1;
+    MATRIX* matrix=reader1.BmpRead("src/lena.bmp");
+    RS::BasicLayer l1(*matrix);
+    l1.setLayerName("dude1");
+    l1.rightRotate();
+    l1.writeToFile("dude.bmp");
 }
 #endif
