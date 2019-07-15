@@ -139,6 +139,29 @@ RS::BasicLayer::BasicLayer(const dataBuffer& data){
     reInit(data);
 }
 
+RS::BasicLayer::BasicLayer(const std::string& fileName){
+    std::string postfix=getPostfix(fileName);
+    if(postfix==""){
+        err("Unkonw type");
+        reInit();
+    }
+    if(postfix=="bmp"){
+        Bmp reader;
+        MATRIX* matrix=reader.BmpRead(fileName.c_str());
+        setLayerName(fileName);
+        reInit(*matrix);
+    }
+    if(postfix=="png"){
+        //wait to be implemention by ZY SUN
+    }
+    if(postfix=="jpg"||postfix=="jpeg"){
+        //wait to be implemention by ZY SUN
+    }
+    if(postfix=="selfdefination"){
+        //wait to be implemention by ZY SUN
+    }
+}
+
 void RS::BasicLayer::reInit(){
     pointMatrix newMatrix(0,std::vector<RS::BasicPoint>(0));
     datamatrix=newMatrix;

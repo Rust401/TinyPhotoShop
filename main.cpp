@@ -7,6 +7,7 @@
 
 #include "basicDS.h"
 #include "BmpReader.h"
+#include "utils.h"
 
 #ifdef TEST1
 int main()
@@ -245,11 +246,10 @@ int main()
 #ifdef READ_WRITE_TEST
 int main()
 {
-    RS::BasicLayer l1;
-    l1.readFromFile("src/lena.bmp");
+    RS::BasicLayer l1("src/lena.bmp");
     l1.setLayerName("dude1");
-    //l1.rightRotate();
-    //l1.upDownReverse();
+    l1.rightRotate();
+    l1.upDownReverse();
     l1.leftRightReverse();
     l1.writeToFile("dude.bmp");
 }

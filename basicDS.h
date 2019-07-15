@@ -71,6 +71,7 @@ public:
         const uint16_t layerNumber,const bool Valid):datamatrix(datamatrix),
         name(name),layerNumber(layerNumber),Valid(Valid){}
     BasicLayer(const dataBuffer& datas);
+    BasicLayer(const std::string& fileName);
     virtual ~BasicLayer(){}
     virtual void reInit();
     virtual void reInit(const int16_t width,const int16_t length);
