@@ -105,6 +105,7 @@ public:
     virtual bool rectangleRotate();
 
     virtual bool writeToFile(const std::string& fileName);
+    virtual bool readFromFile(const std::string& fileName);
     
     BasicLayer& operator=(const BasicLayer& layer);
 };

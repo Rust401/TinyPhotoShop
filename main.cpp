@@ -245,11 +245,12 @@ int main()
 #ifdef READ_WRITE_TEST
 int main()
 {
-    Bmp reader1;
-    MATRIX* matrix=reader1.BmpRead("src/lena.bmp");
-    RS::BasicLayer l1(*matrix);
+    RS::BasicLayer l1;
+    l1.readFromFile("src/lena.bmp");
     l1.setLayerName("dude1");
-    l1.rightRotate();
+    //l1.rightRotate();
+    //l1.upDownReverse();
+    l1.leftRightReverse();
     l1.writeToFile("dude.bmp");
 }
 #endif

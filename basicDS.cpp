@@ -325,7 +325,7 @@ bool RS::BasicLayer::leftRightReverse(){
         uint16_t left=0;
         uint16_t right=datamatrix[0].size()-1;
         while(left<=right){
-            std::swap(datamatrix[i][left--],datamatrix[i][right--]);
+            std::swap(datamatrix[i][left++],datamatrix[i][right--]);
         }
     }
     return false;
@@ -362,7 +362,13 @@ bool RS::BasicLayer::writeToFile(const std::string& fileName){
     return writer.BmpWrite(&outputData,fileName.c_str());
 }
 
-
+bool RS::BasicLayer::readFromFile(const std::string& fileName){
+    Bmp reader;
+    MATRIX* matrix=reader.BmpRead(fileName.c_str());
+    if(matrix==nullptr)return false;
+    reInit(*matrix);
+    return true;
+}
 
 
 //----------------------------------
