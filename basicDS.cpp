@@ -139,6 +139,29 @@ RS::BasicLayer::BasicLayer(const dataBuffer& data){
     reInit(data);
 }
 
+RS::BasicLayer::BasicLayer(const std::string& fileName){
+    std::string postfix=getPostfix(fileName);
+    if(postfix==""){
+        err("Unkonw type");
+        reInit();
+    }
+    if(postfix=="bmp"){
+        Bmp reader;
+        MATRIX* matrix=reader.BmpRead(fileName.c_str());
+        setLayerName(fileName);
+        reInit(*matrix);
+    }
+    if(postfix=="png"){
+        //wait to be implemention by ZY SUN
+    }
+    if(postfix=="jpg"||postfix=="jpeg"){
+        //wait to be implemention by ZY SUN
+    }
+    if(postfix=="selfdefination"){
+        //wait to be implemention by ZY SUN
+    }
+}
+
 void RS::BasicLayer::reInit(){
     pointMatrix newMatrix(0,std::vector<RS::BasicPoint>(0));
     datamatrix=newMatrix;
@@ -325,12 +348,13 @@ bool RS::BasicLayer::leftRightReverse(){
         uint16_t left=0;
         uint16_t right=datamatrix[0].size()-1;
         while(left<=right){
-            std::swap(datamatrix[i][left--],datamatrix[i][right--]);
+            std::swap(datamatrix[i][left++],datamatrix[i][right--]);
         }
     }
     return false;
 }
 
+//maybe bug here, check the bug!
 bool RS::BasicLayer::taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_t columnE){
     if(datamatrix.size()==0)return false;
     if(datamatrix[0].size()==0)return false;
@@ -351,6 +375,21 @@ bool RS::BasicLayer::taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_
     reInit(tmp);
     name=newName;
     Valid=newValid;
+    return true;
+}
+
+bool RS::BasicLayer::writeToFile(const std::string& fileName){
+    Bmp writer;
+    dataBuffer outputData;
+    getDataBuffer(outputData);
+    return writer.BmpWrite(&outputData,fileName.c_str());
+}
+
+bool RS::BasicLayer::readFromFile(const std::string& fileName){
+    Bmp reader;
+    MATRIX* matrix=reader.BmpRead(fileName.c_str());
+    if(matrix==nullptr)return false;
+    reInit(*matrix);
     return true;
 }
 

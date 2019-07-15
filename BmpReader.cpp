@@ -66,19 +66,19 @@ MATRIX* Bmp::BmpRead(const char *Filename) {
 
 	return res;
 }
-void Bmp::BmpWrite(MATRIX* layer,const char* Filename) {
+bool Bmp::BmpWrite(MATRIX* layer,const char* Filename) {
 	FILE *fp;
 	bmpFileHead *H = new bmpFileHead;
 	bmpInfoHead *I = new bmpInfoHead;
 	int height, width;
 	if (Filename == NULL) {
 		err("empty file name.");
-		return;
+		return false;
 	}
     fp=fopen(Filename,"wb");
     if(fp==nullptr){
         err("open failed.");
-        return;
+        return false;
     }
 	//if the file can be opened
 	char *buffer = new char[MAXSIZE];
@@ -92,11 +92,7 @@ void Bmp::BmpWrite(MATRIX* layer,const char* Filename) {
 	for (int i = height - 1; i >= 0; i--) {
 		for (int j = 0; j < width; j++) {
 			uint32_t tmp = (*layer)[i][j];
-	/*		if (j < 5) {
-				std::cout << tmp << " " << i << std::endl;
-			}*/
 			char *t = (char *)&tmp;
-	//		std::cout << "111" << std::endl;
 			*buffer = *(t + 2);
 			*(buffer + 1) = *(t + 1);
 			*(buffer + 2) = *t;
@@ -104,11 +100,9 @@ void Bmp::BmpWrite(MATRIX* layer,const char* Filename) {
 		}
 		temp = (4 - (3 * (int)width & 3)) & 3;
 		for (int j = 0; j < temp; j++) {
-//			std::cout << "222" << std::endl;
 			*buffer = 0x00;
 			buffer++;
 		}
-//		std::cout << "333" << std::endl;
 	}
 
 	//write the head
@@ -138,7 +132,7 @@ void Bmp::BmpWrite(MATRIX* layer,const char* Filename) {
 		delete[]buffer;
 		buffer = nullptr;
 	}
-	return;
+	return true;
 }
 void Bmp::ReadFileHead(bmpFileHead *H,char **buffer) {
 	memcpy(H, *buffer, sizeof(bmpFileHead));//get file head

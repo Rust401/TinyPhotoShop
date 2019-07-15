@@ -11,6 +11,7 @@
 #include <unordered_map>
 #include <math.h>
 #include <algorithm>
+#include "BmpReader.h"
 
 #define pointMatrix std::vector<std::vector<RS::BasicPoint>>
 #define dataBuffer std::vector<std::vector<uint32_t>>
@@ -70,6 +71,7 @@ public:
         const uint16_t layerNumber,const bool Valid):datamatrix(datamatrix),
         name(name),layerNumber(layerNumber),Valid(Valid){}
     BasicLayer(const dataBuffer& datas);
+    BasicLayer(const std::string& fileName);
     virtual ~BasicLayer(){}
     virtual void reInit();
     virtual void reInit(const int16_t width,const int16_t length);
@@ -102,6 +104,9 @@ public:
 
     virtual bool squareRotate();
     virtual bool rectangleRotate();
+
+    virtual bool writeToFile(const std::string& fileName);
+    virtual bool readFromFile(const std::string& fileName);
     
     BasicLayer& operator=(const BasicLayer& layer);
 };

@@ -8,7 +8,6 @@
 #include <iomanip>
 #include <string>
 #include <stddef.h>
-#include <error.h>
 #include <memory.h>
 
 #pragma pack(1)
@@ -46,7 +45,7 @@ private:
 	void ReadInfoHead(bmpInfoHead *I,char **buffer);
 public:
 	MATRIX* BmpRead(const char *Filename);
-	void BmpWrite(MATRIX* layer,const char *Filename);
+	bool BmpWrite(MATRIX* layer,const char *Filename);
 };
 
 #pragma pack()

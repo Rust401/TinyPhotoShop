@@ -1,13 +1,13 @@
 //#define TEST1
 //#define TEST2
 //#define TEST3
-#define BMP_TEST
+#define READ_WRITE_TEST
+//#define BMP_TEST
 
 
 #include "basicDS.h"
 #include "BmpReader.h"
-
-
+#include "utils.h"
 
 #ifdef TEST1
 int main()
@@ -218,10 +218,11 @@ int main()
     l1.rightRotate();
 
     matrix=reader2.BmpRead("src/lena.bmp");
-    writer.BmpWrite(matrix,"test2.bmp");
     RS::BasicLayer l2(*matrix);
     l2.setLayerName("dude2");
     l2.upDownReverse();
+    writer.BmpWrite(matrix,"test2.bmp");
+    
 
     matrix=reader3.BmpRead("src/sails.bmp");
     writer.BmpWrite(matrix,"test3.bmp");
@@ -239,5 +240,17 @@ int main()
     
     //writer.BmpWrite(&data,"test.bmp");
     //system("sudo mv test.bmp /test");
+}
+#endif
+
+#ifdef READ_WRITE_TEST
+int main()
+{
+    RS::BasicLayer l1("src/lena.bmp");
+    l1.setLayerName("dude1");
+    l1.rightRotate();
+    l1.upDownReverse();
+    l1.leftRightReverse();
+    l1.writeToFile("dude.bmp");
 }
 #endif
