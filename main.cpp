@@ -1,13 +1,24 @@
 //#define TEST1
 //#define TEST2
 //#define TEST3
-#define READ_WRITE_TEST
+//#define READ_WRITE_TEST
 //#define BMP_TEST
+#define TAYLOR
 
 
 #include "basicDS.h"
 #include "BmpReader.h"
 #include "utils.h"
+
+
+#ifdef TAYLOR
+int main()
+{
+    RS::BasicLayer l1("src/lena.bmp");
+    l1.taylor(20,20,280,200);
+    l1.writeToFile("test/newlena.bmp");
+}
+#endif
 
 #ifdef TEST1
 int main()
@@ -136,7 +147,7 @@ int main()
 {
     Bmp reader;
     Bmp writer;
-    MATRIX* p=reader.BmpRead("resource/lena.bmp");
+    MATRIX* p=reader.BmpRead("src/lena.bmp");
     dataBuffer lenaBuffer=*p;
 
     RS::BasicLayer l5(lenaBuffer);
@@ -247,10 +258,11 @@ int main()
 int main()
 {
     RS::BasicLayer l1("src/lena.bmp");
-    l1.setLayerName("dude1");
+    l1.taylor(20,20,100,200);
+    /* l1.setLayerName("dude1");
     l1.rightRotate();
     l1.upDownReverse();
-    l1.leftRightReverse();
+    l1.leftRightReverse(); */
     l1.writeToFile("dude.bmp");
 }
 #endif

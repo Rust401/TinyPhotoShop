@@ -365,9 +365,9 @@ bool RS::BasicLayer::taylor(uint16_t rowS,uint16_t columnS,uint16_t rowE,uint16_
     uint16_t newWidth=rowE-rowS+1;
     uint16_t newLength=columnE-columnS+1;
     dataBuffer tmp(newWidth,rowData(newLength,0));
-    for(int i=rowS;i<rowE;++i){
-        for(int j=columnS;j<columnS;++j){
-            tmp[i][j]=datamatrix[i][j].getUint32();
+    for(int i=0;i<newWidth;++i){
+        for(int j=0;j<newLength;++j){
+            tmp[i][j]=datamatrix[i+rowS][j+rowE].getUint32();
         }
     }
     std::string newName=name;
